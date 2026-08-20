@@ -653,8 +653,122 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
 }
 .nyx-scale-in{animation:nyxScaleIn .6s var(--ease) both;}
 @keyframes nyxScaleIn{
-  from{opacity:0;transform:scale(.97);}
-  to{opacity:1;transform:scale(1);}
+  0%{opacity:0;transform:scale(.92) translateY(16px);filter:blur(6px);}
+  55%{opacity:1;transform:scale(1.014) translateY(-2px);filter:blur(0);}
+  100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0);}
+}
+
+/* ── activation sequence: shake / flash / glitch bars / sweep / title glitch ── */
+@keyframes nyxShake{
+  0%{transform:translate(0,0) rotate(0);}
+  10%{transform:translate(-3px,2px) rotate(-.35deg);}
+  20%{transform:translate(4px,-2px) rotate(.35deg);}
+  30%{transform:translate(-5px,3px) rotate(-.5deg);}
+  40%{transform:translate(5px,-3px) rotate(.5deg);}
+  50%{transform:translate(-4px,2px) rotate(-.3deg);}
+  60%{transform:translate(4px,-2px) rotate(.3deg);}
+  70%{transform:translate(-2px,1px) rotate(-.15deg);}
+  80%{transform:translate(2px,-1px) rotate(.15deg);}
+  90%{transform:translate(-1px,1px) rotate(0);}
+  100%{transform:translate(0,0) rotate(0);}
+}
+body.nyx-activating{
+  animation:nyxShake .42s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.nyx-flash{
+  position:fixed;inset:0;z-index:1100;
+  background:var(--green);
+  opacity:0;
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+.nyx-flash.fire{animation:nyxFlashPulse .5s ease-out both;}
+@keyframes nyxFlashPulse{
+  0%{opacity:0;}
+  8%{opacity:.9;}
+  22%{opacity:.1;}
+  38%{opacity:.45;}
+  55%{opacity:0;}
+  100%{opacity:0;}
+}
+
+.nyx-glitch-bars{
+  position:fixed;inset:0;z-index:1099;
+  pointer-events:none;
+  overflow:hidden;
+}
+.nyx-glitch-bars span{
+  position:absolute;left:0;right:0;height:3px;
+  opacity:0;
+  mix-blend-mode:screen;
+  transform:translateX(0);
+}
+.nyx-glitch-bars.fire span{
+  animation-name:nyxGlitchBar;
+  animation-duration:.42s;
+  animation-timing-function:steps(3,end);
+  animation-fill-mode:both;
+}
+@keyframes nyxGlitchBar{
+  0%{opacity:0;transform:translateX(0);}
+  15%{opacity:.85;transform:translateX(-30px);}
+  35%{opacity:.6;transform:translateX(24px);}
+  55%{opacity:.85;transform:translateX(-14px);}
+  75%{opacity:.4;transform:translateX(8px);}
+  100%{opacity:0;transform:translateX(0);}
+}
+
+.nyx-sweep{
+  position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+  box-shadow:0 0 24px 5px rgba(61,220,151,.75);
+  z-index:5;
+  opacity:0;
+  pointer-events:none;
+}
+.nyx-sweep.run{animation:nyxSweepDown .7s cubic-bezier(.4,0,.2,1) both;}
+@keyframes nyxSweepDown{
+  0%{top:0;opacity:1;}
+  85%{opacity:1;}
+  100%{top:100%;opacity:0;}
+}
+
+.nyx-glitch-text{position:relative;display:inline-block;}
+.nyx-glitch-text.run::before,
+.nyx-glitch-text.run::after{
+  content:attr(data-text);
+  position:absolute;left:0;top:0;width:100%;
+  background:#010202;
+}
+.nyx-glitch-text.run::before{
+  color:var(--orange);
+  animation:nyxGlitchTop .5s steps(2,end) both;
+}
+.nyx-glitch-text.run::after{
+  color:var(--blue);
+  animation:nyxGlitchBottom .5s steps(2,end) both;
+}
+@keyframes nyxGlitchTop{
+  0%{clip-path:inset(0 0 88% 0);transform:translateX(2px);}
+  20%{clip-path:inset(12% 0 58% 0);transform:translateX(-2px);}
+  40%{clip-path:inset(48% 0 22% 0);transform:translateX(2px);}
+  60%{clip-path:inset(20% 0 68% 0);transform:translateX(-1px);}
+  80%{clip-path:inset(76% 0 6% 0);transform:translateX(1px);}
+  100%{clip-path:inset(0 0 100% 0);opacity:0;}
+}
+@keyframes nyxGlitchBottom{
+  0%{clip-path:inset(68% 0 0 0);transform:translateX(-2px);}
+  20%{clip-path:inset(32% 0 38% 0);transform:translateX(2px);}
+  40%{clip-path:inset(58% 0 10% 0);transform:translateX(-2px);}
+  60%{clip-path:inset(12% 0 58% 0);transform:translateX(1px);}
+  80%{clip-path:inset(88% 0 0 0);transform:translateX(-1px);}
+  100%{clip-path:inset(100% 0 0 0);opacity:0;}
+}
+@media(prefers-reduced-motion:reduce){
+  body.nyx-activating{animation:none!important;}
+  .nyx-flash.fire,.nyx-glitch-bars.fire span,.nyx-sweep.run,
+  .nyx-glitch-text.run::before,.nyx-glitch-text.run::after{animation:none!important;display:none!important;}
 }
 .nyx-inner{
   position:relative;z-index:1;
@@ -871,6 +985,316 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
 @media(prefers-reduced-motion:reduce){
   .music-toggle .mt-bars span{animation:none!important;}
 }
+
+/* ══════════════════════════════════════
+   RH-AI CHAT WIDGET
+══════════════════════════════════════ */
+.rhai-launcher{
+  position:fixed;
+  left:20px;
+  bottom:20px;
+  z-index:9998;
+  display:flex;align-items:center;gap:9px;
+  height:46px;
+  padding:0 18px 0 14px;
+  background:var(--bg3);
+  border:1px solid var(--border-md);
+  border-radius:999px;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 4px 18px rgba(0,0,0,.35);
+  transition:border-color .25s var(--ease),background .25s var(--ease),transform .2s var(--ease);
+}
+.rhai-launcher:hover{border-color:var(--border-hi);background:var(--bg2);transform:translateY(-2px);}
+.rhai-launcher:active{transform:translateY(0);}
+.rhai-launcher-icon{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;color:#04120b;font-weight:700;
+  box-shadow:0 0 10px rgba(61,220,151,.55);
+  flex-shrink:0;
+}
+.rhai-launcher-label{
+  font-family:var(--f-mono);
+  font-size:.72rem;letter-spacing:.1em;
+  color:var(--ink);text-transform:uppercase;
+}
+.rhai-launcher.is-open{opacity:0;pointer-events:none;transform:translateY(6px) scale(.94);}
+@media(max-width:640px){
+  .rhai-launcher{left:14px;bottom:14px;height:42px;padding:0 14px 0 12px;}
+  .rhai-launcher-label{display:none;}
+}
+
+.rhai-panel{
+  position:fixed;
+  left:20px;
+  bottom:20px;
+  z-index:9998;
+  width:368px;
+  max-width:calc(100vw - 28px);
+  height:520px;
+  max-height:calc(100vh - 40px);
+  display:flex;
+  flex-direction:column;
+  background:var(--surface);
+  border:1px solid var(--border-md);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+  opacity:0;
+  transform:translateY(16px) scale(.97);
+  pointer-events:none;
+  transition:opacity .28s var(--ease),transform .28s var(--ease);
+}
+.rhai-panel.is-open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+.rhai-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;
+  background:var(--bg3);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.rhai-header-left{display:flex;align-items:center;gap:10px;}
+.rhai-avatar{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(145deg,var(--green),#1f8f63);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-weight:700;font-size:.7rem;color:#04120b;
+  flex-shrink:0;
+}
+.rhai-title{font-family:var(--f-mono);font-size:.8rem;letter-spacing:.1em;color:var(--green);text-transform:uppercase;line-height:1.3;}
+.rhai-sub{font-size:.66rem;color:var(--ink-3);letter-spacing:.03em;line-height:1.3;}
+.rhai-header-actions{display:flex;align-items:center;gap:6px;}
+.rhai-icon-btn{
+  width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;border-radius:7px;
+  color:var(--ink-2);cursor:pointer;font-size:.85rem;line-height:1;
+  transition:background .2s var(--ease),color .2s var(--ease);
+}
+.rhai-icon-btn:hover{background:var(--bg2);color:var(--ink);}
+
+.rhai-messages{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(61,220,151,.05), transparent 55%),
+    var(--surface);
+}
+.rhai-messages::-webkit-scrollbar{width:5px;}
+.rhai-messages::-webkit-scrollbar-thumb{background:rgba(61,220,151,.3);border-radius:3px;}
+
+.rhai-msg{display:flex;max-width:88%;}
+.rhai-msg-bot{align-self:flex-start;}
+.rhai-msg-user{align-self:flex-end;}
+.rhai-bubble{
+  font-family:var(--f-body);
+  font-size:.83rem;line-height:1.55;
+  padding:10px 13px;
+  border-radius:12px;
+  white-space:pre-wrap;
+  word-wrap:break-word;
+}
+.rhai-msg-bot .rhai-bubble{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--ink-2);
+  border-bottom-left-radius:4px;
+}
+.rhai-msg-user .rhai-bubble{
+  background:rgba(61,220,151,.12);
+  border:1px solid rgba(61,220,151,.28);
+  color:var(--ink);
+  border-bottom-right-radius:4px;
+}
+.rhai-msg-error .rhai-bubble{
+  background:rgba(255,107,53,.1);
+  border:1px solid rgba(255,107,53,.3);
+  color:#ffb08c;
+}
+
+.rhai-typing{display:flex;gap:4px;align-items:center;padding:4px 2px;}
+.rhai-typing span{
+  width:5px;height:5px;border-radius:50%;background:var(--ink-3);
+  animation:rhaiTyping 1s ease-in-out infinite;
+}
+.rhai-typing span:nth-child(2){animation-delay:.15s;}
+.rhai-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes rhaiTyping{
+  0%,60%,100%{opacity:.3;transform:translateY(0);}
+  30%{opacity:1;transform:translateY(-2px);}
+}
+
+.rhai-input-row{
+  display:flex;align-items:flex-end;gap:8px;
+  padding:12px;
+  border-top:1px solid var(--border);
+  background:var(--bg3);
+  flex-shrink:0;
+}
+.rhai-input{
+  flex:1;
+  resize:none;
+  background:var(--bg2);
+  border:1px solid var(--border-md);
+  border-radius:10px;
+  padding:10px 12px;
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:.83rem;
+  line-height:1.4;
+  max-height:100px;
+  outline:none;
+  transition:border-color .2s var(--ease);
+}
+.rhai-input:focus{border-color:rgba(61,220,151,.5);}
+.rhai-input::placeholder{color:var(--ink-3);}
+.rhai-send{
+  width:38px;height:38px;flex-shrink:0;
+  border-radius:10px;
+  background:var(--green);
+  border:none;
+  color:#04120b;
+  font-size:1rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .2s var(--ease),transform .2s var(--ease);
+}
+.rhai-send:hover{transform:translateY(-1px);}
+.rhai-send:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.rhai-footer-hint{
+  text-align:center;
+  font-size:.6rem;
+  letter-spacing:.03em;
+  color:var(--ink-3);
+  padding:7px 0 10px;
+  background:var(--bg3);
+  flex-shrink:0;
+}
+@media(max-width:640px){
+  .rhai-panel{
+    left:10px;right:10px;bottom:10px;
+    width:auto;height:min(72vh,560px);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .rhai-typing span{animation:none!important;}
+}
+
+/* ══════════════════════════════════════
+   SCROLL PROGRESS BAR
+══════════════════════════════════════ */
+.scroll-progress{
+  position:fixed;top:0;left:0;
+  height:2px;width:0%;
+  background:linear-gradient(90deg,var(--green),var(--blue));
+  box-shadow:0 0 10px rgba(61,220,151,.6);
+  z-index:10001;
+  pointer-events:none;
+  transition:width .1s linear;
+}
+
+/* ══════════════════════════════════════
+   COMMAND PALETTE (Ctrl/Cmd+K)
+══════════════════════════════════════ */
+.cmdk-backdrop{
+  position:fixed;inset:0;z-index:10500;
+  background:rgba(3,3,6,.72);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:12vh;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s var(--ease);
+}
+.cmdk-backdrop.open{opacity:1;pointer-events:auto;}
+.cmdk-panel{
+  width:560px;max-width:calc(100vw - 32px);
+  max-height:60vh;
+  background:var(--bg3);
+  border:1px solid var(--border-md);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.6);
+  transform:translateY(-10px) scale(.98);
+  transition:transform .2s var(--ease);
+  display:flex;flex-direction:column;
+}
+.cmdk-backdrop.open .cmdk-panel{transform:translateY(0) scale(1);}
+.cmdk-input-row{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.cmdk-prompt{font-family:var(--f-mono);color:var(--green);font-size:.9rem;}
+.cmdk-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--ink);font-family:var(--f-body);font-size:.92rem;
+}
+.cmdk-input::placeholder{color:var(--ink-3);}
+.cmdk-esc{
+  font-family:var(--f-mono);font-size:.6rem;letter-spacing:.05em;
+  color:var(--ink-3);border:1px solid var(--border-md);
+  padding:2px 6px;border-radius:5px;flex-shrink:0;
+}
+.cmdk-list{overflow-y:auto;padding:8px;}
+.cmdk-list::-webkit-scrollbar{width:5px;}
+.cmdk-list::-webkit-scrollbar-thumb{background:rgba(61,220,151,.3);border-radius:3px;}
+.cmdk-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 12px;border-radius:9px;cursor:pointer;
+  transition:background .12s var(--ease);
+}
+.cmdk-item.active,.cmdk-item:hover{background:var(--bg2);}
+.cmdk-item-left{display:flex;align-items:center;gap:11px;min-width:0;}
+.cmdk-item-icon{
+  width:28px;height:28px;flex-shrink:0;border-radius:7px;
+  background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.22);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:.68rem;color:var(--green);
+}
+.cmdk-item-text{min-width:0;}
+.cmdk-item-title{font-size:.85rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmdk-item-sub{font-size:.68rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmdk-item-key{
+  font-family:var(--f-mono);font-size:.62rem;color:var(--ink-3);
+  border:1px solid var(--border-md);border-radius:5px;padding:2px 6px;
+  flex-shrink:0;
+}
+.cmdk-empty{padding:24px 12px;text-align:center;color:var(--ink-3);font-size:.8rem;}
+@media(max-width:640px){
+  .cmdk-backdrop{padding-top:8vh;}
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast-stack{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  z-index:10600;
+  display:flex;flex-direction:column;gap:8px;
+  align-items:center;
+  pointer-events:none;
+}
+.toast{
+  background:var(--bg3);
+  border:1px solid var(--border-md);
+  color:var(--ink);
+  font-family:var(--f-mono);
+  font-size:.75rem;letter-spacing:.02em;
+  padding:9px 16px;border-radius:999px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .25s var(--ease),transform .25s var(--ease);
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast .tk{color:var(--green);}
 </style>
 </head>
 <body>
@@ -884,6 +1308,58 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
   <span class="mt-bars"><span></span><span></span><span></span><span></span></span>
   <span class="mt-tip" id="musicToggleTip">Mute</span>
 </button>
+
+<!-- RH-AI Chat Widget -->
+<button type="button" class="rhai-launcher" id="rhaiLauncher" aria-label="Open RH-AI chat" aria-expanded="false">
+  <span class="rhai-launcher-icon">AI</span>
+  <span class="rhai-launcher-label">RH-AI</span>
+</button>
+
+<div class="rhai-panel" id="rhaiPanel" role="dialog" aria-label="RH-AI chat" aria-hidden="true">
+  <div class="rhai-header">
+    <div class="rhai-header-left">
+      <div class="rhai-avatar">AI</div>
+      <div>
+        <div class="rhai-title">RH-AI</div>
+        <div class="rhai-sub">by Raj Hridoy</div>
+      </div>
+    </div>
+    <div class="rhai-header-actions">
+      <button type="button" class="rhai-icon-btn" id="rhaiReset" aria-label="Clear conversation" title="Clear conversation">&#8635;</button>
+      <button type="button" class="rhai-icon-btn" id="rhaiClose" aria-label="Close RH-AI chat" title="Close">&times;</button>
+    </div>
+  </div>
+
+  <div class="rhai-messages" id="rhaiMessages" role="log" aria-live="polite">
+    <div class="rhai-msg rhai-msg-bot">
+      <div class="rhai-bubble">Hey, I'm <strong>RH-AI</strong> — Raj Hridoy's assistant. Ask me about his work, skills, or projects, or anything else you're curious about.</div>
+    </div>
+  </div>
+
+  <div class="rhai-input-row">
+    <textarea id="rhaiInput" class="rhai-input" placeholder="Message RH-AI…" rows="1" maxlength="2000"></textarea>
+    <button type="button" class="rhai-send" id="rhaiSend" aria-label="Send message">&#8593;</button>
+  </div>
+  <div class="rhai-footer-hint">Powered by Groq · AI can make mistakes</div>
+</div>
+
+<!-- Scroll progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Command palette (Ctrl/Cmd+K) -->
+<div class="cmdk-backdrop" id="cmdkBackdrop" aria-hidden="true">
+  <div class="cmdk-panel" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="cmdk-input-row">
+      <span class="cmdk-prompt">&gt;</span>
+      <input type="text" id="cmdkInput" class="cmdk-input" placeholder="Type a command or search…" autocomplete="off" spellcheck="false">
+      <span class="cmdk-esc">ESC</span>
+    </div>
+    <div class="cmdk-list" id="cmdkList"></div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-stack" id="toastStack"></div>
 
 <div class="layer-grid"></div>
 <div class="layer-glow"></div>
@@ -905,6 +1381,7 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
     <div class="nav-ping">
       <span class="ping-dot"></span>
       <span id="clock">--:--</span>
+      <button type="button" id="cmdkHint" class="cmdk-esc" style="cursor:pointer;background:transparent;font-family:var(--f-mono);" title="Open command palette" aria-label="Open command palette">&#8984;K</button>
     </div>
   </div>
 </nav>
@@ -1205,15 +1682,20 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
 </footer>
 
 <!-- ══ NYX // RESEARCH CONTROL (hidden — reachable only via terminal) ══ -->
+<!-- NYX activation FX (screen flash + glitch scan bars) -->
+<div class="nyx-flash" id="nyxFlash"></div>
+<div class="nyx-glitch-bars" id="nyxGlitchBars"></div>
+
 <div id="nyx" role="dialog" aria-modal="true" aria-label="NYX Research Control">
   <div class="nyx-grid-bg"></div>
+  <div class="nyx-sweep" id="nyxSweep"></div>
   <div class="nyx-inner">
 
     <div class="nyx-header nyx-scale-in">
       <div class="nyx-brand">
         <div class="nyx-brand-mark">NX</div>
         <div>
-          <div class="nyx-title">NYX Control Node</div>
+          <div class="nyx-title nyx-glitch-text" id="nyxTitleGlitch" data-text="NYX Control Node">NYX Control Node</div>
           <div class="nyx-sub">Research &amp; Operations Interface</div>
         </div>
       </div>
@@ -1534,7 +2016,7 @@ tick();setInterval(tick,15000);
     const key=cmd.toLowerCase();
 
     if(key==='nyx'){
-      openNyx();
+      triggerNyxActivation();
       return;
     }
 
@@ -1584,9 +2066,25 @@ tick();setInterval(tick,15000);
   const nyx        = document.getElementById('nyx');
   const nyxBody    = document.getElementById('nyxTermBody');
   const nyxInput   = document.getElementById('nyxInput');
+  const nyxFlash   = document.getElementById('nyxFlash');
+  const nyxBars    = document.getElementById('nyxGlitchBars');
+  const nyxSweep   = document.getElementById('nyxSweep');
+  const nyxTitle   = document.getElementById('nyxTitleGlitch');
   let savedScrollY = 0;
   const nyxHistory=[];
   let nyxHistoryPtr=-1;
+
+  // Build a handful of scanline glitch bars once, reused on every activation.
+  if(nyxBars){
+    const barCount = 6;
+    for(let i=0;i<barCount;i++){
+      const bar=document.createElement('span');
+      bar.style.top=(6 + Math.random()*88)+'%';
+      bar.style.background=(i%3===0)?'var(--orange)':(i%3===1)?'var(--blue)':'var(--green)';
+      bar.style.animationDelay=(Math.random()*0.08)+'s';
+      nyxBars.appendChild(bar);
+    }
+  }
 
   function nyxAppend(html){
     const div=document.createElement('div');
@@ -1664,7 +2162,47 @@ tick();setInterval(tick,15000);
       `<span class="nyx-val">type 'help' to begin.</span>`,
     ]);
     setTimeout(()=>nyxInput && nyxInput.focus({preventScroll:true}), 400);
+
+    // Boot-up flourishes: scanline sweep down the panel + glitch-in title.
+    if(motionOK){
+      if(nyxSweep){
+        nyxSweep.classList.remove('run'); void nyxSweep.offsetWidth;
+        nyxSweep.classList.add('run');
+      }
+      if(nyxTitle){
+        nyxTitle.classList.remove('run'); void nyxTitle.offsetWidth;
+        nyxTitle.classList.add('run');
+        setTimeout(()=>nyxTitle.classList.remove('run'), 550);
+      }
+    }
   }
+
+  // "Gaming transform" activation: a quick screen shake + flash + glitch
+  // scan-bars plays first, then the NYX panel boots up underneath it.
+  function triggerNyxActivation(){
+    if(!motionOK){ openNyx(); return; }
+
+    document.body.classList.remove('nyx-activating'); void document.body.offsetWidth;
+    document.body.classList.add('nyx-activating');
+
+    if(nyxFlash){
+      nyxFlash.classList.remove('fire'); void nyxFlash.offsetWidth;
+      nyxFlash.classList.add('fire');
+    }
+    if(nyxBars){
+      nyxBars.classList.remove('fire'); void nyxBars.offsetWidth;
+      nyxBars.classList.add('fire');
+    }
+
+    setTimeout(()=>{
+      document.body.classList.remove('nyx-activating');
+      if(nyxFlash) nyxFlash.classList.remove('fire');
+      if(nyxBars) nyxBars.classList.remove('fire');
+      openNyx();
+    }, 380);
+  }
+  // Exposed so the command palette (separate script scope) can trigger it.
+  window.triggerNyxActivation = triggerNyxActivation;
   function closeNyx(){
     nyx.classList.remove('open');
     const done=()=>{
@@ -1800,6 +2338,445 @@ tick();setInterval(tick,15000);
     if(document.visibilityState === 'visible' && !userMuted && audio.paused && started){
       audio.play().catch(function(){});
     }
+  });
+})();
+</script>
+
+<!-- ══════════════════════════════════════
+     RH-AI — GROQ-POWERED CHAT ASSISTANT
+══════════════════════════════════════ -->
+<script>
+(function(){
+  // ──────────────────────────────────────────────────────────────
+  // ⚠️ SECURITY NOTE: this site is static with no backend, so this
+  // key is embedded client-side and visible to anyone who views
+  // page source or the network tab. Only use a key you're OK with
+  // being public, keep spend limits on it in the Groq console, and
+  // rotate it if you ever see abnormal usage.
+  // ──────────────────────────────────────────────────────────────
+  var GROQ_API_KEY = "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";
+  var GROQ_MODEL    = "openai/gpt-oss-120b";
+  var GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+
+  var SYSTEM_PROMPT = "You are RH-AI, the personal AI assistant embedded on Raj Hridoy's " +
+    "portfolio website. Raj Hridoy is a programmer and security researcher who builds " +
+    "software and studies how systems break. You represent him: be helpful, sharp, and " +
+    "concise — this is a small chat widget, so keep answers tight (a few sentences unless " +
+    "the visitor clearly wants depth). Be friendly but professional. If you don't know " +
+    "something specific about Raj that wasn't given to you, say so honestly instead of " +
+    "guessing. You can help visitors with general programming, security, and tech questions too.";
+
+  var MAX_TURNS = 12;        // messages kept in context (user+assistant combined)
+  var MAX_MESSAGES_SESSION = 40; // soft cap so one visitor can't hammer the key all day
+  var messageCountThisSession = 0;
+
+  var launcher = document.getElementById('rhaiLauncher');
+  var panel    = document.getElementById('rhaiPanel');
+  var closeBtn = document.getElementById('rhaiClose');
+  var resetBtn = document.getElementById('rhaiReset');
+  var msgBox   = document.getElementById('rhaiMessages');
+  var input    = document.getElementById('rhaiInput');
+  var sendBtn  = document.getElementById('rhaiSend');
+
+  if(!launcher || !panel || !input || !sendBtn) return;
+
+  var history = []; // {role:'user'|'assistant', content:string}
+  var isSending = false;
+
+  function openPanel(){
+    panel.classList.add('is-open');
+    launcher.classList.add('is-open');
+    panel.setAttribute('aria-hidden','false');
+    launcher.setAttribute('aria-expanded','true');
+    setTimeout(function(){ input.focus(); }, 200);
+  }
+  function closePanel(){
+    panel.classList.remove('is-open');
+    launcher.classList.remove('is-open');
+    panel.setAttribute('aria-hidden','true');
+    launcher.setAttribute('aria-expanded','false');
+  }
+
+  launcher.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
+  });
+
+  resetBtn.addEventListener('click', function(){
+    history = [];
+    messageCountThisSession = 0;
+    msgBox.innerHTML = '';
+    appendBotMessage("Conversation cleared. What would you like to know?");
+  });
+
+  // Auto-resize the textarea as the visitor types.
+  input.addEventListener('input', function(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+  });
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      handleSend();
+    }
+  });
+  sendBtn.addEventListener('click', handleSend);
+
+  function scrollToBottom(){
+    msgBox.scrollTop = msgBox.scrollHeight;
+  }
+
+  function appendUserMessage(text){
+    var row = document.createElement('div');
+    row.className = 'rhai-msg rhai-msg-user';
+    var bubble = document.createElement('div');
+    bubble.className = 'rhai-bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    msgBox.appendChild(row);
+    scrollToBottom();
+  }
+
+  function appendBotMessage(text){
+    var row = document.createElement('div');
+    row.className = 'rhai-msg rhai-msg-bot';
+    var bubble = document.createElement('div');
+    bubble.className = 'rhai-bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    msgBox.appendChild(row);
+    scrollToBottom();
+    return bubble;
+  }
+
+  function appendErrorMessage(text){
+    var row = document.createElement('div');
+    row.className = 'rhai-msg rhai-msg-bot rhai-msg-error';
+    var bubble = document.createElement('div');
+    bubble.className = 'rhai-bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    msgBox.appendChild(row);
+    scrollToBottom();
+  }
+
+  function showTyping(){
+    var row = document.createElement('div');
+    row.className = 'rhai-msg rhai-msg-bot';
+    row.id = 'rhaiTypingRow';
+    var bubble = document.createElement('div');
+    bubble.className = 'rhai-bubble';
+    bubble.innerHTML = '<span class="rhai-typing"><span></span><span></span><span></span></span>';
+    row.appendChild(bubble);
+    msgBox.appendChild(row);
+    scrollToBottom();
+  }
+  function hideTyping(){
+    var row = document.getElementById('rhaiTypingRow');
+    if(row) row.remove();
+  }
+
+  function setSending(state){
+    isSending = state;
+    sendBtn.disabled = state;
+    input.disabled = state;
+  }
+
+  function handleSend(){
+    var text = input.value.trim();
+    if(!text || isSending) return;
+
+    if(GROQ_API_KEY.indexOf('PASTE_YOUR') === 0){
+      appendUserMessage(text);
+      appendErrorMessage("RH-AI isn't connected yet — add your Groq API key in the script before this goes live.");
+      input.value = '';
+      input.style.height = 'auto';
+      return;
+    }
+
+    if(messageCountThisSession >= MAX_MESSAGES_SESSION){
+      appendErrorMessage("That's a lot of chatting! This session has hit its message limit — refresh the page to start a new one.");
+      return;
+    }
+
+    appendUserMessage(text);
+    input.value = '';
+    input.style.height = 'auto';
+
+    history.push({role:'user', content:text});
+    if(history.length > MAX_TURNS) history = history.slice(history.length - MAX_TURNS);
+
+    setSending(true);
+    showTyping();
+    messageCountThisSession++;
+
+    var payloadMessages = [{role:'system', content:SYSTEM_PROMPT}].concat(history);
+
+    fetch(GROQ_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + GROQ_API_KEY
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: payloadMessages,
+        temperature: 0.7,
+        max_completion_tokens: 500
+      })
+    })
+    .then(function(res){
+      if(!res.ok){
+        return res.json().catch(function(){ return null; }).then(function(errBody){
+          var msg = (errBody && errBody.error && errBody.error.message) ? errBody.error.message : ('Request failed (' + res.status + ')');
+          throw new Error(msg);
+        });
+      }
+      return res.json();
+    })
+    .then(function(data){
+      hideTyping();
+      var reply = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if(!reply){
+        appendErrorMessage("RH-AI didn't return a response — please try again.");
+        return;
+      }
+      reply = reply.trim();
+      appendBotMessage(reply);
+      history.push({role:'assistant', content:reply});
+      if(history.length > MAX_TURNS) history = history.slice(history.length - MAX_TURNS);
+    })
+    .catch(function(err){
+      hideTyping();
+      appendErrorMessage("Couldn't reach RH-AI right now (" + err.message + "). Please try again in a moment.");
+    })
+    .finally(function(){
+      setSending(false);
+      input.focus();
+    });
+  }
+})();
+</script>
+
+<!-- ══════════════════════════════════════
+     SCROLL PROGRESS + TOASTS + COMMAND PALETTE
+══════════════════════════════════════ -->
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── Scroll progress bar ── */
+  var progressBar = document.getElementById('scrollProgress');
+  function updateProgress(){
+    var doc = document.documentElement;
+    var scrollTop = doc.scrollTop || document.body.scrollTop;
+    var scrollHeight = (doc.scrollHeight || document.body.scrollHeight) - doc.clientHeight;
+    var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    if(progressBar) progressBar.style.width = pct + '%';
+  }
+  if(progressBar){
+    updateProgress();
+    window.addEventListener('scroll', updateProgress, {passive:true});
+    window.addEventListener('resize', updateProgress, {passive:true});
+  }
+
+  /* ── Toasts ── */
+  var toastStack = document.getElementById('toastStack');
+  function showToast(text){
+    if(!toastStack) return;
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = text;
+    toastStack.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    setTimeout(function(){
+      el.classList.remove('show');
+      setTimeout(function(){ el.remove(); }, 300);
+    }, 2200);
+  }
+  window.rhToast = showToast; // exposed for reuse elsewhere on the page
+
+  function copyText(text, label){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        showToast((label || 'Copied') + ' to clipboard');
+      }).catch(function(){
+        showToast('Could not copy — please copy manually');
+      });
+    }else{
+      showToast('Clipboard not available in this browser');
+    }
+  }
+
+  /* ── Command palette ── */
+  var backdrop = document.getElementById('cmdkBackdrop');
+  var cmdInput = document.getElementById('cmdkInput');
+  var cmdList  = document.getElementById('cmdkList');
+  var cmdHint  = document.getElementById('cmdkHint');
+  var activeIndex = 0;
+  var filtered = [];
+
+  var actions = [
+    {
+      title:'Go to About', sub:'Jump to the About section', icon:'#',
+      key:'', run:function(){ scrollToId('about'); }
+    },
+    {
+      title:'Go to Work', sub:'Jump to Capabilities', icon:'#',
+      key:'', run:function(){ scrollToId('capabilities'); }
+    },
+    {
+      title:'Go to Projects', sub:'Jump to the Projects section', icon:'#',
+      key:'', run:function(){ scrollToId('projects'); }
+    },
+    {
+      title:'Go to Connect', sub:'Jump to contact info', icon:'#',
+      key:'', run:function(){ scrollToId('connect'); }
+    },
+    {
+      title:'Copy email', sub:'rajhridoy100az@gmail.com', icon:'@',
+      key:'', run:function(){ copyText('rajhridoy100az@gmail.com', 'Email'); }
+    },
+    {
+      title:'Open RH-AI', sub:'Chat with the AI assistant', icon:'AI',
+      key:'', run:function(){
+        var launcher = document.getElementById('rhaiLauncher');
+        if(launcher) launcher.click();
+      }
+    },
+    {
+      title:'Toggle music', sub:'Play or mute the background track', icon:'♫',
+      key:'', run:function(){
+        var m = document.getElementById('musicToggle');
+        if(m) m.click();
+      }
+    },
+    {
+      title:'Launch NYX', sub:'Enter the hidden research console', icon:'NX',
+      key:'', run:function(){
+        if(typeof triggerNyxActivation === 'function') triggerNyxActivation();
+      }
+    },
+    {
+      title:'Back to top', sub:'Scroll to the top of the page', icon:'↑',
+      key:'', run:function(){ window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'}); }
+    },
+  ];
+
+  function scrollToId(id){
+    var el = document.getElementById(id);
+    if(el) el.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
+  }
+
+  function renderList(items){
+    cmdList.innerHTML = '';
+    if(!items.length){
+      var empty = document.createElement('div');
+      empty.className = 'cmdk-empty';
+      empty.textContent = 'No matching commands';
+      cmdList.appendChild(empty);
+      return;
+    }
+    items.forEach(function(action, i){
+      var row = document.createElement('div');
+      row.className = 'cmdk-item' + (i === activeIndex ? ' active' : '');
+      row.setAttribute('data-idx', i);
+
+      var left = document.createElement('div');
+      left.className = 'cmdk-item-left';
+      var iconEl = document.createElement('div');
+      iconEl.className = 'cmdk-item-icon';
+      iconEl.textContent = action.icon;
+      var textEl = document.createElement('div');
+      textEl.className = 'cmdk-item-text';
+      var titleEl = document.createElement('div');
+      titleEl.className = 'cmdk-item-title';
+      titleEl.textContent = action.title;
+      var subEl = document.createElement('div');
+      subEl.className = 'cmdk-item-sub';
+      subEl.textContent = action.sub;
+      textEl.appendChild(titleEl);
+      textEl.appendChild(subEl);
+      left.appendChild(iconEl);
+      left.appendChild(textEl);
+      row.appendChild(left);
+
+      row.addEventListener('click', function(){ runAction(action); });
+      row.addEventListener('mousemove', function(){
+        if(activeIndex !== i){ activeIndex = i; renderList(filtered); }
+      });
+      cmdList.appendChild(row);
+    });
+  }
+
+  function filterActions(query){
+    var q = query.trim().toLowerCase();
+    if(!q) return actions.slice();
+    return actions.filter(function(a){
+      return a.title.toLowerCase().indexOf(q) !== -1 || a.sub.toLowerCase().indexOf(q) !== -1;
+    });
+  }
+
+  function runAction(action){
+    closePalette();
+    setTimeout(function(){ action.run(); }, 120);
+  }
+
+  function openPalette(){
+    filtered = filterActions('');
+    activeIndex = 0;
+    renderList(filtered);
+    backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden','false');
+    cmdInput.value = '';
+    setTimeout(function(){ cmdInput.focus(); }, 60);
+    document.body.style.overflow = 'hidden';
+  }
+  function closePalette(){
+    backdrop.classList.remove('open');
+    backdrop.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+
+  if(cmdHint) cmdHint.addEventListener('click', openPalette);
+  if(backdrop){
+    backdrop.addEventListener('click', function(e){
+      if(e.target === backdrop) closePalette();
+    });
+  }
+  if(cmdInput){
+    cmdInput.addEventListener('input', function(){
+      filtered = filterActions(cmdInput.value);
+      activeIndex = 0;
+      renderList(filtered);
+    });
+    cmdInput.addEventListener('keydown', function(e){
+      if(e.key === 'ArrowDown'){
+        e.preventDefault();
+        if(filtered.length) activeIndex = (activeIndex + 1) % filtered.length;
+        renderList(filtered);
+      }else if(e.key === 'ArrowUp'){
+        e.preventDefault();
+        if(filtered.length) activeIndex = (activeIndex - 1 + filtered.length) % filtered.length;
+        renderList(filtered);
+      }else if(e.key === 'Enter'){
+        e.preventDefault();
+        if(filtered[activeIndex]) runAction(filtered[activeIndex]);
+      }else if(e.key === 'Escape'){
+        closePalette();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', function(e){
+    var isCmdK = (e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K');
+    if(isCmdK){
+      e.preventDefault();
+      if(backdrop.classList.contains('open')) closePalette(); else openPalette();
+      return;
+    }
+    if(e.key === 'Escape' && backdrop.classList.contains('open')) closePalette();
   });
 })();
 </script>
