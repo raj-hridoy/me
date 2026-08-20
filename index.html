@@ -794,9 +794,96 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
   #nyx,.nyx-scale-in{transition:none!important;animation:none!important;}
   html{scroll-behavior:auto;}
 }
+
+/* ══════════════════════════════════════
+   MUSIC TOGGLE
+══════════════════════════════════════ */
+.music-toggle{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:10000;
+  width:46px;height:46px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg3);
+  border:1px solid var(--border-md);
+  border-radius:50%;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  transition:border-color .25s var(--ease),background .25s var(--ease),transform .2s var(--ease);
+  box-shadow:0 4px 18px rgba(0,0,0,.35);
+}
+.music-toggle:hover{
+  border-color:var(--border-hi);
+  background:var(--bg2);
+  transform:translateY(-2px);
+}
+.music-toggle:active{transform:translateY(0);}
+.music-toggle .mt-bars{
+  display:flex;align-items:flex-end;gap:3px;height:16px;
+}
+.music-toggle .mt-bars span{
+  display:block;width:3px;border-radius:2px;
+  background:var(--green);
+  transform-origin:bottom;
+  animation:mtBar 1.1s ease-in-out infinite;
+}
+.music-toggle .mt-bars span:nth-child(1){height:40%;animation-delay:0s;}
+.music-toggle .mt-bars span:nth-child(2){height:100%;animation-delay:.15s;}
+.music-toggle .mt-bars span:nth-child(3){height:65%;animation-delay:.3s;}
+.music-toggle .mt-bars span:nth-child(4){height:85%;animation-delay:.45s;}
+@keyframes mtBar{
+  0%,100%{transform:scaleY(.35);}
+  50%{transform:scaleY(1);}
+}
+.music-toggle.is-muted .mt-bars span{
+  animation-play-state:paused;
+  transform:scaleY(.28);
+  background:var(--ink-3);
+}
+.music-toggle .mt-tip{
+  position:absolute;
+  right:56px;
+  bottom:50%;
+  transform:translateY(50%);
+  background:var(--bg3);
+  border:1px solid var(--border-md);
+  color:var(--ink-2);
+  font-family:var(--f-mono);
+  font-size:.68rem;
+  letter-spacing:.04em;
+  padding:6px 10px;
+  border-radius:6px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s var(--ease),transform .2s var(--ease);
+}
+.music-toggle:hover .mt-tip{
+  opacity:1;
+  transform:translateY(50%) translateX(-4px);
+}
+@media(max-width:640px){
+  .music-toggle{right:14px;bottom:14px;width:42px;height:42px;}
+  .music-toggle .mt-tip{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  .music-toggle .mt-bars span{animation:none!important;}
+}
 </style>
 </head>
 <body>
+
+<audio id="backgroundMusic" preload="auto" loop>
+  <source src="bg-web.ogg" type="audio/ogg">
+  <source src="bg-web.mp3" type="audio/mpeg">
+</audio>
+
+<button type="button" class="music-toggle" id="musicToggle" aria-label="Toggle background music" aria-pressed="true" title="Toggle music">
+  <span class="mt-bars"><span></span><span></span><span></span><span></span></span>
+  <span class="mt-tip" id="musicToggleTip">Mute</span>
+</button>
 
 <div class="layer-grid"></div>
 <div class="layer-glow"></div>
@@ -1616,6 +1703,104 @@ tick();setInterval(tick,15000);
       }
     });
   }
+})();
+</script>
+
+<!-- ══════════════════════════════════════
+     BACKGROUND MUSIC — AUTOPLAY SYSTEM
+══════════════════════════════════════ -->
+<script>
+(function(){
+  var audio = document.getElementById('backgroundMusic');
+  var btn   = document.getElementById('musicToggle');
+  var tip   = document.getElementById('musicToggleTip');
+  if(!audio || !btn) return;
+
+  audio.volume = 0.55;
+
+  var userMuted = false;   // true only if the visitor explicitly pauses via the button
+  var started   = false;   // true once playback has actually begun at least once
+
+  function setUIPlaying(){
+    btn.classList.remove('is-muted');
+    btn.setAttribute('aria-pressed','true');
+    if(tip) tip.textContent = 'Mute';
+  }
+  function setUIMuted(){
+    btn.classList.add('is-muted');
+    btn.setAttribute('aria-pressed','false');
+    if(tip) tip.textContent = 'Unmute';
+  }
+
+  function attemptAutoplay(){
+    var p = audio.play();
+    if(p && typeof p.then === 'function'){
+      p.then(function(){
+        started = true;
+        if(!userMuted) setUIPlaying();
+      }).catch(function(){
+        // Autoplay blocked by browser policy — wait for first interaction.
+        setUIMuted();
+        armInteractionFallback();
+      });
+    }
+  }
+
+  function armInteractionFallback(){
+    var events = ['pointerdown','touchstart','keydown','wheel'];
+    function tryStart(e){
+      if(started || userMuted) { cleanup(); return; }
+      // Let the button's own click handler own this interaction —
+      // otherwise pointerdown/keydown fires here first and starts
+      // playback, then the button's click handler immediately
+      // toggles it back off.
+      if(e && e.target && btn.contains(e.target)) return;
+      audio.play().then(function(){
+        started = true;
+        setUIPlaying();
+        cleanup();
+      }).catch(function(){ /* still blocked, keep listening */ });
+    }
+    function cleanup(){
+      events.forEach(function(evt){
+        document.removeEventListener(evt, tryStart);
+      });
+    }
+    events.forEach(function(evt){
+      document.addEventListener(evt, tryStart, {passive:true});
+    });
+  }
+
+  // If the very first interaction lands on the toggle button while
+  // autoplay is still blocked, this handles the play/on-state directly
+  // so the fallback listener above (which ignores clicks on the
+  // button) doesn't need to.
+
+  // Fire the very first play attempt immediately — no delay.
+  attemptAutoplay();
+
+  // Manual toggle control.
+  btn.addEventListener('click', function(){
+    if(audio.paused){
+      userMuted = false;
+      audio.play().then(function(){
+        started = true;
+        setUIPlaying();
+      }).catch(function(){});
+    }else{
+      userMuted = true;
+      audio.pause();
+      setUIMuted();
+    }
+  });
+
+  // If the tab regains visibility and playback silently stalled
+  // (some mobile browsers suspend audio in background tabs), resume it.
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible' && !userMuted && audio.paused && started){
+      audio.play().catch(function(){});
+    }
+  });
 })();
 </script>
 </body>
