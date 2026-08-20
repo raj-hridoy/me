@@ -4,10 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Raj Hridoy — Programmer & Security Researcher</title>
-<meta name="description" content="Raj Hridoy — programmer and cybersecurity enthusiast building software and studying how systems break.">
+<meta name="description" content="Official portfolio of Raj Hridoy, a programmer and security researcher from Bangladesh.">
+<meta name="author" content="Raj Hridoy">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://raj-hridoy.github.io/me/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Raj Hridoy — Programmer & Security Researcher">
+<meta property="og:description" content="Official portfolio of Raj Hridoy, a programmer and security researcher from Bangladesh.">
+<meta property="og:url" content="https://raj-hridoy.github.io/me/">
+<meta property="og:site_name" content="Raj Hridoy">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Raj Hridoy — Programmer & Security Researcher">
+<meta name="twitter:description" content="Official portfolio of Raj Hridoy, a programmer and security researcher from Bangladesh.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Raj Hridoy",
+  "url": "https://raj-hridoy.github.io/me/"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Raj Hridoy",
+  "url": "https://raj-hridoy.github.io/me/",
+  "jobTitle": "Programmer & Security Researcher",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Sirajganj",
+    "addressCountry": "BD"
+  },
+  "sameAs": [
+    "https://www.facebook.com/0xrajhridoy",
+    "https://instagram.com/wzz_hridoy"
+  ]
+}
+</script>
 
 <style>
 /* ══════════════════════════════════════
@@ -1423,9 +1467,9 @@ body.nyx-activating{
         <span class="tag def">DEFENSE</span>
       </div>
 
-      <h1 class="hero-name">
-        <span class="line1">RAJ</span>
-        <span class="line2">HRIDOY</span>
+      <h1 class="hero-name" aria-label="Raj Hridoy">
+        <span class="line1" aria-hidden="true">RAJ</span>
+        <span class="line2" aria-hidden="true">HRIDOY</span>
       </h1>
 
       <p class="hero-desc">
@@ -2254,9 +2298,26 @@ tick();setInterval(tick,15000);
   var tip   = document.getElementById('musicToggleTip');
   if(!audio || !btn) return;
 
-  audio.volume = 0.55;
+  audio.volume = 0.20;
 
-  var userMuted = false;   // true only if the visitor explicitly pauses via the button
+  var STORAGE_KEY = 'rajHridoy_music_enabled';
+  var storageOK = true;
+  var savedPref = null; // null = no saved preference yet (first visit), else 'true'/'false'
+  try{
+    savedPref = window.localStorage.getItem(STORAGE_KEY);
+  }catch(e){
+    storageOK = false; // localStorage unavailable — just operate without persistence
+  }
+
+  function savePref(enabled){
+    if(!storageOK) return;
+    try{
+      window.localStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
+    }catch(e){ /* ignore quota/privacy-mode errors — music still works, just not persisted */ }
+  }
+
+  // true only if the visitor explicitly muted (this session or a prior one)
+  var userMuted = savedPref === 'false';
   var started   = false;   // true once playback has actually begun at least once
 
   function setUIPlaying(){
@@ -2271,6 +2332,11 @@ tick();setInterval(tick,15000);
   }
 
   function attemptAutoplay(){
+    if(userMuted){
+      // Visitor previously disabled music — respect that and don't autoplay.
+      setUIMuted();
+      return;
+    }
     var p = audio.play();
     if(p && typeof p.then === 'function'){
       p.then(function(){
@@ -2321,12 +2387,14 @@ tick();setInterval(tick,15000);
   btn.addEventListener('click', function(){
     if(audio.paused){
       userMuted = false;
+      savePref(true);
       audio.play().then(function(){
         started = true;
         setUIPlaying();
       }).catch(function(){});
     }else{
       userMuted = true;
+      savePref(false);
       audio.pause();
       setUIMuted();
     }
