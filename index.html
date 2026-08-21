@@ -180,8 +180,15 @@ body::after{
   text-transform:uppercase;color:var(--ink-3);
   padding:6px 14px;border-radius:6px;
   transition:color .25s,background .25s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;left:14px;right:14px;bottom:3px;height:1px;
+  background:var(--green);transform:scaleX(0);transform-origin:left;
+  transition:transform .4s var(--ease);
 }
 .nav-links a:hover{color:var(--ink);background:rgba(255,255,255,.05);}
+.nav-links a:hover::after{transform:scaleX(1);}
 .nav-ping{
   display:flex;align-items:center;gap:8px;
   font-family:var(--f-mono);font-size:.65rem;color:var(--ink-3);
@@ -341,7 +348,16 @@ section{padding:140px 0;position:relative;}
   background:var(--ink);color:var(--bg);
   transition:transform .4s var(--ease),box-shadow .4s var(--ease);
   white-space:nowrap;
+  position:relative;overflow:hidden;
 }
+.btn-solid::before{
+  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.4),transparent);
+  transform:skewX(-20deg);
+  transition:left .65s var(--ease);
+  pointer-events:none;
+}
+.btn-solid:hover::before{left:130%;}
 .btn-solid:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(0,0,0,.55);}
 .btn-ghost{
   display:inline-flex;align-items:center;gap:8px;
@@ -435,6 +451,14 @@ section{padding:140px 0;position:relative;}
   letter-spacing:-.02em;line-height:1.15;
   margin-bottom:56px;
 }
+.section-title.reveal{
+  filter:blur(9px);
+  transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease);
+}
+.section-title.reveal.visible{filter:blur(0);}
+@media(prefers-reduced-motion:reduce){
+  .section-title.reveal{filter:none;transition:none;}
+}
 
 .cap-grid{
   display:grid;grid-template-columns:repeat(3,1fr);
@@ -444,9 +468,23 @@ section{padding:140px 0;position:relative;}
 .cap-card{
   background:var(--surface);padding:36px 30px 40px;
   position:relative;overflow:hidden;
-  transition:background .4s var(--ease);
+  transition:opacity .8s var(--ease),background .4s var(--ease),transform .45s var(--ease),box-shadow .45s var(--ease);
+  --cmx:50%;--cmy:50%;
 }
-.cap-card:hover{background:var(--bg3);}
+.cap-card:hover{
+  background:var(--bg3);
+  transform:scale(1.012);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 18px 40px -22px rgba(0,0,0,.55);
+  z-index:2;
+}
+
+/* cursor-tracked spotlight glow */
+.cap-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(280px circle at var(--cmx) var(--cmy),rgba(255,255,255,.07),transparent 72%);
+  opacity:0;transition:opacity .4s var(--ease);
+}
+.cap-card:hover::after{opacity:1;}
 
 /* top shimmer line on hover */
 .cap-card::before{
@@ -466,7 +504,9 @@ section{padding:140px 0;position:relative;}
   width:44px;height:44px;border-radius:10px;border:1px solid;
   display:flex;align-items:center;justify-content:center;
   margin-bottom:24px;
+  transition:transform .45s var(--ease);
 }
+.cap-card:hover .cap-icon-box{transform:translateY(-4px) rotate(-6deg);}
 .cap-icon-box svg{
   width:19px;height:19px;
   stroke:currentColor;stroke-width:1.6;
@@ -512,9 +552,21 @@ section{padding:140px 0;position:relative;}
   background:var(--surface);padding:36px 30px 40px;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;
-  transition:background .4s var(--ease);
+  transition:opacity .8s var(--ease),background .4s var(--ease),transform .45s var(--ease),box-shadow .45s var(--ease);
+  --cmx:50%;--cmy:50%;
 }
-.proj-card:hover{background:var(--bg3);}
+.proj-card:hover{
+  background:var(--bg3);
+  transform:scale(1.012);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 18px 40px -22px rgba(0,0,0,.55);
+  z-index:2;
+}
+.proj-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(280px circle at var(--cmx) var(--cmy),rgba(255,255,255,.07),transparent 72%);
+  opacity:0;transition:opacity .4s var(--ease);
+}
+.proj-card:hover::after{opacity:1;}
 .proj-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
   opacity:0;transition:opacity .4s var(--ease);
@@ -605,7 +657,7 @@ section{padding:140px 0;position:relative;}
   border-top:1px solid var(--border);
   text-decoration:none;color:var(--ink);
   position:relative;overflow:hidden;
-  transition:padding-left .4s var(--ease),background .3s;
+  transition:padding-left .4s var(--ease),background .3s,opacity .8s var(--ease),transform .6s var(--ease);
 }
 .connect-row:last-child{border-bottom:1px solid var(--border);}
 .connect-row::before{
@@ -705,20 +757,51 @@ footer{padding:44px 0 40px;border-top:1px solid var(--border);}
 /* ── activation sequence: shake / flash / glitch bars / sweep / title glitch ── */
 @keyframes nyxShake{
   0%{transform:translate(0,0) rotate(0);}
-  10%{transform:translate(-3px,2px) rotate(-.35deg);}
-  20%{transform:translate(4px,-2px) rotate(.35deg);}
-  30%{transform:translate(-5px,3px) rotate(-.5deg);}
-  40%{transform:translate(5px,-3px) rotate(.5deg);}
-  50%{transform:translate(-4px,2px) rotate(-.3deg);}
-  60%{transform:translate(4px,-2px) rotate(.3deg);}
-  70%{transform:translate(-2px,1px) rotate(-.15deg);}
-  80%{transform:translate(2px,-1px) rotate(.15deg);}
-  90%{transform:translate(-1px,1px) rotate(0);}
+  10%{transform:translate(-6px,4px) rotate(-.7deg);}
+  20%{transform:translate(7px,-4px) rotate(.7deg);}
+  30%{transform:translate(-8px,5px) rotate(-1deg);}
+  40%{transform:translate(8px,-5px) rotate(1deg);}
+  50%{transform:translate(-7px,4px) rotate(-.6deg);}
+  60%{transform:translate(7px,-4px) rotate(.6deg);}
+  70%{transform:translate(-4px,2px) rotate(-.3deg);}
+  80%{transform:translate(4px,-2px) rotate(.3deg);}
+  90%{transform:translate(-2px,1px) rotate(0);}
   100%{transform:translate(0,0) rotate(0);}
 }
 body.nyx-activating{
-  animation:nyxShake .42s cubic-bezier(.36,.07,.19,.97) both;
+  animation:nyxShake .5s cubic-bezier(.36,.07,.19,.97) both;
 }
+
+/* second, heavier shockwave — fires once the boot text finishes typing */
+@keyframes nyxShakeHard{
+  0%{transform:translate(0,0) rotate(0) scale(1);}
+  8%{transform:translate(-11px,7px) rotate(-1.3deg) scale(1.006);}
+  16%{transform:translate(12px,-9px) rotate(1.3deg) scale(.994);}
+  24%{transform:translate(-13px,10px) rotate(-1.6deg) scale(1.008);}
+  32%{transform:translate(13px,-9px) rotate(1.5deg) scale(.992);}
+  40%{transform:translate(-10px,7px) rotate(-1.1deg) scale(1.005);}
+  50%{transform:translate(10px,-7px) rotate(1deg) scale(.996);}
+  60%{transform:translate(-7px,5px) rotate(-.65deg) scale(1.003);}
+  70%{transform:translate(7px,-4px) rotate(.5deg) scale(.998);}
+  80%{transform:translate(-3px,2px) rotate(-.25deg) scale(1);}
+  90%{transform:translate(2px,-1px) rotate(.1deg) scale(1);}
+  100%{transform:translate(0,0) rotate(0) scale(1);}
+}
+body.nyx-activating-hard{
+  animation:nyxShakeHard .65s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* panel "transformation" — warps/glitches the console itself after boot text lands */
+@keyframes nyxPanelWarp{
+  0%{transform:scale(1) skew(0deg,0deg);filter:none;}
+  10%{transform:scale(1.02,.982) skew(-1.6deg,.4deg);filter:hue-rotate(30deg) saturate(1.5) brightness(1.15);}
+  22%{transform:scale(.98,1.024) skew(1.3deg,-.3deg);filter:hue-rotate(-18deg) saturate(1.3);}
+  36%{transform:scale(1.014,.992) skew(-.9deg,.2deg);filter:hue-rotate(14deg) saturate(1.15);}
+  52%{transform:scale(.992,1.01) skew(.55deg,-.15deg);filter:hue-rotate(-6deg);}
+  70%{transform:scale(1.006,.998) skew(-.2deg,.05deg);filter:none;}
+  100%{transform:scale(1) skew(0deg,0deg);filter:none;}
+}
+.nyx-inner.nyx-warp{animation:nyxPanelWarp .7s cubic-bezier(.36,.07,.19,.97) both;}
 
 .nyx-flash{
   position:fixed;inset:0;z-index:1100;
@@ -810,9 +893,10 @@ body.nyx-activating{
   100%{clip-path:inset(100% 0 0 0);opacity:0;}
 }
 @media(prefers-reduced-motion:reduce){
-  body.nyx-activating{animation:none!important;}
+  body.nyx-activating,body.nyx-activating-hard{animation:none!important;}
   .nyx-flash.fire,.nyx-glitch-bars.fire span,.nyx-sweep.run,
   .nyx-glitch-text.run::before,.nyx-glitch-text.run::after{animation:none!important;display:none!important;}
+  .nyx-inner.nyx-warp{animation:none!important;}
 }
 .nyx-inner{
   position:relative;z-index:1;
@@ -1547,9 +1631,9 @@ body.nyx-activating{
     <span class="kicker orange reveal">Capabilities</span>
     <h2 class="section-title reveal" style="transition-delay:.08s;">What I spend<br>my time on</h2>
 
-    <div class="cap-grid reveal" style="transition-delay:.14s;">
+    <div class="cap-grid">
 
-      <div class="cap-card build">
+      <div class="cap-card build reveal" style="transition-delay:.05s;">
         <span class="cap-num">01</span>
         <div class="cap-icon-box">
           <svg viewBox="0 0 24 24"><polyline points="8 6 2 12 8 18"/><polyline points="16 6 22 12 16 18"/></svg>
@@ -1560,7 +1644,7 @@ body.nyx-activating{
         <span class="cap-ghost">01</span>
       </div>
 
-      <div class="cap-card defend">
+      <div class="cap-card defend reveal" style="transition-delay:.17s;">
         <span class="cap-num">02</span>
         <div class="cap-icon-box">
           <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
@@ -1571,7 +1655,7 @@ body.nyx-activating{
         <span class="cap-ghost">02</span>
       </div>
 
-      <div class="cap-card attack">
+      <div class="cap-card attack reveal" style="transition-delay:.29s;">
         <span class="cap-num">03</span>
         <div class="cap-icon-box">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="22"/><line x1="2" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="22" y2="12"/></svg>
@@ -1592,9 +1676,9 @@ body.nyx-activating{
     <span class="kicker orange reveal">Research Archive</span>
     <h2 class="section-title reveal" style="transition-delay:.08s;">Selected<br>Projects</h2>
 
-    <div class="proj-grid reveal" style="transition-delay:.14s;">
+    <div class="proj-grid">
 
-      <div class="proj-card cat-privacy">
+      <div class="proj-card cat-privacy reveal" style="transition-delay:.05s;">
         <span class="proj-num">01</span>
         <span class="proj-category">Privacy Engineering</span>
         <h3>VaultChat</h3>
@@ -1618,7 +1702,7 @@ body.nyx-activating{
         <span class="proj-ghost">01</span>
       </div>
 
-      <div class="proj-card cat-security">
+      <div class="proj-card cat-security reveal" style="transition-delay:.17s;">
         <span class="proj-num">02</span>
         <span class="proj-category">Security Research</span>
         <h3>Phantom</h3>
@@ -1642,7 +1726,7 @@ body.nyx-activating{
         <span class="proj-ghost">02</span>
       </div>
 
-      <div class="proj-card cat-systems no-link">
+      <div class="proj-card cat-systems no-link reveal" style="transition-delay:.29s;">
         <span class="proj-num">03</span>
         <span class="proj-category">Interactive Systems</span>
         <h3>Signal Graph</h3>
@@ -1669,9 +1753,9 @@ body.nyx-activating{
       Whether you want to talk security, code, or just say hello — I'm reachable across a few platforms.
     </p>
 
-    <div class="connect-list reveal" style="transition-delay:.14s;">
+    <div class="connect-list">
 
-      <a href="https://www.facebook.com/0xrajhridoy" target="_blank" rel="noopener" class="connect-row">
+      <a href="https://www.facebook.com/0xrajhridoy" target="_blank" rel="noopener" class="connect-row reveal" style="transition-delay:.05s;">
         <div class="c-icon">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
         </div>
@@ -1684,7 +1768,7 @@ body.nyx-activating{
         </span>
       </a>
 
-      <a href="https://instagram.com/wzz_hridoy" target="_blank" rel="noopener" class="connect-row">
+      <a href="https://instagram.com/wzz_hridoy" target="_blank" rel="noopener" class="connect-row reveal" style="transition-delay:.14s;">
         <div class="c-icon">
           <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><line x1="17.4" y1="6.6" x2="17.41" y2="6.6"/></svg>
         </div>
@@ -1697,7 +1781,7 @@ body.nyx-activating{
         </span>
       </a>
 
-      <a href="mailto:rajhridoy100az@gmail.com" class="connect-row">
+      <a href="mailto:rajhridoy100az@gmail.com" class="connect-row reveal" style="transition-delay:.23s;">
         <div class="c-icon">
           <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
         </div>
@@ -1733,7 +1817,7 @@ body.nyx-activating{
 <div id="nyx" role="dialog" aria-modal="true" aria-label="NYX Research Control">
   <div class="nyx-grid-bg"></div>
   <div class="nyx-sweep" id="nyxSweep"></div>
-  <div class="nyx-inner">
+  <div class="nyx-inner" id="nyxInner">
 
     <div class="nyx-header nyx-scale-in">
       <div class="nyx-brand">
@@ -1821,6 +1905,15 @@ if(motionOK){
     document.documentElement.style.setProperty('--mx',(e.clientX/window.innerWidth*100)+'%');
     document.documentElement.style.setProperty('--my',(e.clientY/window.innerHeight*100)+'%');
   },{passive:true});
+
+  /* Cursor-tracked spotlight glow on capability & project cards */
+  document.querySelectorAll('.cap-card, .proj-card').forEach(card=>{
+    card.addEventListener('mousemove', e=>{
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--cmx', ((e.clientX - r.left) / r.width * 100) + '%');
+      card.style.setProperty('--cmy', ((e.clientY - r.top) / r.height * 100) + '%');
+    },{passive:true});
+  });
 }
 
 /* Reveal on scroll */
@@ -2114,6 +2207,7 @@ tick();setInterval(tick,15000);
   const nyxBars    = document.getElementById('nyxGlitchBars');
   const nyxSweep   = document.getElementById('nyxSweep');
   const nyxTitle   = document.getElementById('nyxTitleGlitch');
+  const nyxInner   = document.getElementById('nyxInner');
   let savedScrollY = 0;
   const nyxHistory=[];
   let nyxHistoryPtr=-1;
@@ -2137,8 +2231,11 @@ tick();setInterval(tick,15000);
     nyxBody.appendChild(div);
     nyxBody.scrollTop=nyxBody.scrollHeight;
   }
-  function nyxType(linesArr){
+  function nyxType(linesArr, onDone){
     linesArr.forEach((html,i)=>setTimeout(()=>nyxAppend(html), i*50));
+    if(typeof onDone==='function'){
+      setTimeout(onDone, linesArr.length*50 + 160);
+    }
   }
 
   const nyxCommands={
@@ -2204,7 +2301,7 @@ tick();setInterval(tick,15000);
     nyxType([
       `<span class="nyx-val">connection established.</span>`,
       `<span class="nyx-val">type 'help' to begin.</span>`,
-    ]);
+    ], motionOK ? triggerNyxSettleBurst : null);
     setTimeout(()=>nyxInput && nyxInput.focus({preventScroll:true}), 400);
 
     // Boot-up flourishes: scanline sweep down the panel + glitch-in title.
@@ -2219,6 +2316,34 @@ tick();setInterval(tick,15000);
         setTimeout(()=>nyxTitle.classList.remove('run'), 550);
       }
     }
+  }
+
+  // Second, heavier shockwave once the boot text has finished printing:
+  // a harder screen shake + another flash/glitch-bar pulse + the panel
+  // itself warping/glitching for a beat, like the connection just locked in.
+  function triggerNyxSettleBurst(){
+    document.body.classList.remove('nyx-activating-hard'); void document.body.offsetWidth;
+    document.body.classList.add('nyx-activating-hard');
+
+    if(nyxFlash){
+      nyxFlash.classList.remove('fire'); void nyxFlash.offsetWidth;
+      nyxFlash.classList.add('fire');
+    }
+    if(nyxBars){
+      nyxBars.classList.remove('fire'); void nyxBars.offsetWidth;
+      nyxBars.classList.add('fire');
+    }
+    if(nyxInner){
+      nyxInner.classList.remove('nyx-warp'); void nyxInner.offsetWidth;
+      nyxInner.classList.add('nyx-warp');
+    }
+
+    setTimeout(()=>{
+      document.body.classList.remove('nyx-activating-hard');
+      if(nyxFlash) nyxFlash.classList.remove('fire');
+      if(nyxBars) nyxBars.classList.remove('fire');
+      if(nyxInner) nyxInner.classList.remove('nyx-warp');
+    }, 700);
   }
 
   // "Gaming transform" activation: a quick screen shake + flash + glitch
