@@ -11,16 +11,16 @@
 <meta name="theme-color" content="#0a0a0c">
 <link rel="canonical" href="https://raj-hridoy.github.io/me/">
 
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Raj Hridoy — Security Researcher & Programmer">
 <meta property="og:description" content="Self-taught programmer and security researcher based in Sirajganj, Bangladesh — independent vulnerability research, privacy tooling, and browser security.">
 <meta property="og:url" content="https://raj-hridoy.github.io/me/">
 <meta property="og:site_name" content="Raj Hridoy">
-<meta property="og:image" content="https://raj-hridoy.github.io/me/assets/og-image.png">
+<meta property="og:image" content="https://raj-hridoy.github.io/me/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
@@ -28,7 +28,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Raj Hridoy — Security Researcher & Programmer">
 <meta name="twitter:description" content="Self-taught programmer and security researcher based in Sirajganj, Bangladesh.">
-<meta name="twitter:image" content="https://raj-hridoy.github.io/me/assets/og-image.png">
+<meta name="twitter:image" content="https://raj-hridoy.github.io/me/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@
   "@type": "Person",
   "name": "Raj Hridoy",
   "url": "https://raj-hridoy.github.io/me/",
-  "image": "https://raj-hridoy.github.io/me/assets/og-image.png",
+  "image": "https://raj-hridoy.github.io/me/og-image.png",
   "jobTitle": "Security Researcher & Programmer",
   "address": { "@type": "PostalAddress", "addressLocality": "Sirajganj", "addressCountry": "BD" },
   "knowsAbout": [ "Web Application Security", "Vulnerability Research", "JavaScript", "Python", "Network Protocols", "Browser Privacy" ],
@@ -263,6 +263,14 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
 
 /* command palette (Cmd+K) */
 .cmdk-hint{font-family:var(--f-mono);font-size:.68rem;color:var(--ink-3);border:1px solid var(--line-md);border-radius:6px;padding:5px 8px;background:transparent;}
+.sound-toggle{width:32px;height:32px;border:1px solid var(--line-md);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink-2);transition:color .25s,border-color .25s;}
+.sound-toggle:hover{color:var(--ink);border-color:var(--line-hi);}
+.sound-toggle svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.sound-toggle .ic-off{display:block;}
+.sound-toggle .ic-on{display:none;}
+.sound-toggle[aria-pressed="true"] .ic-off{display:none;}
+.sound-toggle[aria-pressed="true"] .ic-on{display:block;}
+.sound-toggle[aria-pressed="true"]{color:var(--blue);border-color:rgba(91,147,255,.4);}
 .cmdk-backdrop{position:fixed;inset:0;z-index:350;background:rgba(6,6,8,.7);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding-top:14vh;opacity:0;pointer-events:none;transition:opacity .25s;}
 .cmdk-backdrop.open{opacity:1;pointer-events:auto;}
 .cmdk-panel{width:min(560px,90vw);background:var(--surface);border:1px solid var(--line-md);border-radius:14px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.6);}
@@ -308,6 +316,11 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
 <div class="layer-glow"></div>
 <div class="toast-stack" id="toastStack"></div>
 
+<audio id="bgAudio" loop autoplay muted playsinline preload="auto">
+  <source src="bg-web.ogg" type="audio/ogg">
+  <source src="bg-web.mp3" type="audio/mpeg">
+</audio>
+
 <div class="cmdk-backdrop" id="cmdkBackdrop" aria-hidden="true">
   <div class="cmdk-panel" role="dialog" aria-modal="true" aria-label="Command palette">
     <div class="cmdk-input-row">
@@ -334,6 +347,10 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
       <a href="#connect">Contact</a>
     </div>
     <div class="nav-right">
+      <button type="button" class="sound-toggle" id="soundToggle" aria-label="Play background audio" aria-pressed="false" title="Background audio">
+        <svg class="ic-on" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18 6a9 9 0 0 1 0 12"/></svg>
+        <svg class="ic-off" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5z"/><line x1="16" y1="9" x2="22" y2="15"/><line x1="22" y1="9" x2="16" y2="15"/></svg>
+      </button>
       <button type="button" class="cmdk-hint" id="cmdkHint" title="Open command palette">⌘K</button>
       <a href="#connect" class="nav-cta">Say hello</a>
       <button type="button" class="nav-burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false"><span></span></button>
@@ -644,6 +661,56 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
       document.documentElement.style.setProperty('--my', (e.clientY/window.innerHeight*100)+'%');
     }, {passive:true});
   }
+
+  /* background audio — starts muted immediately on load (all browsers allow this),
+     then unmutes automatically the instant the visitor first interacts with the page
+     (click, scroll, or keypress). True unmuted autoplay isn't possible in any modern
+     browser without a gesture, so this is the closest thing to "auto-start" that works
+     everywhere — sound is already running, it just unmutes on first touch. */
+  (function(){
+    var audio = document.getElementById('bgAudio');
+    var btn = document.getElementById('soundToggle');
+    if(!audio || !btn) return;
+    var KEY = 'rh-site-audio-on';
+    audio.volume = 0.35;
+    audio.muted = true;
+
+    function setPressed(on){
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? 'Mute background audio' : 'Play background audio');
+    }
+
+    var explicitlyMuted = false;
+    try{ explicitlyMuted = localStorage.getItem(KEY) === '0'; }catch(e){}
+
+    function unmuteOnInteraction(){
+      if(explicitlyMuted) return;
+      audio.muted = false;
+      if(audio.paused) audio.play().catch(function(){});
+      setPressed(true);
+      try{ localStorage.setItem(KEY, '1'); }catch(e){}
+    }
+    if(!explicitlyMuted){
+      ['pointerdown','keydown','scroll'].forEach(function(evt){
+        document.addEventListener(evt, unmuteOnInteraction, {once:true, passive:true});
+      });
+    }
+
+    btn.addEventListener('click', function(){
+      if(audio.muted || audio.paused){
+        explicitlyMuted = false;
+        audio.muted = false;
+        audio.play().then(function(){ setPressed(true); })
+          .catch(function(){ showToast('Could not play audio in this browser'); });
+        try{ localStorage.setItem(KEY, '1'); }catch(e){}
+      } else {
+        explicitlyMuted = true;
+        audio.muted = true;
+        setPressed(false);
+        try{ localStorage.setItem(KEY, '0'); }catch(e){}
+      }
+    });
+  })();
 
   /* toasts */
   var toastStack = document.getElementById('toastStack');
