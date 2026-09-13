@@ -316,7 +316,7 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
 <div class="layer-glow"></div>
 <div class="toast-stack" id="toastStack"></div>
 
-<audio id="bgAudio" loop autoplay muted playsinline preload="auto">
+<audio id="bgAudio" loop autoplay playsinline preload="auto">
   <source src="bg-web.ogg" type="audio/ogg">
   <source src="bg-web.mp3" type="audio/mpeg">
 </audio>
@@ -662,18 +662,15 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
     }, {passive:true});
   }
 
-  /* background audio — starts muted immediately on load (all browsers allow this),
-     then unmutes automatically the instant the visitor first interacts with the page
-     (click, scroll, or keypress). True unmuted autoplay isn't possible in any modern
-     browser without a gesture, so this is the closest thing to "auto-start" that works
-     everywhere — sound is already running, it just unmutes on first touch. */
+  /* background audio — tries to start fully audible immediately; if the browser blocks
+     that (most will, per platform policy), it falls back to a muted start and unmutes
+     itself the instant the visitor does anything at all on the page. */
   (function(){
     var audio = document.getElementById('bgAudio');
     var btn = document.getElementById('soundToggle');
     if(!audio || !btn) return;
     var KEY = 'rh-site-audio-on';
-    audio.volume = 0.35;
-    audio.muted = true;
+    audio.volume = 1.0;
 
     function setPressed(on){
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -690,9 +687,28 @@ footer{padding:44px 0 40px;border-top:1px solid var(--line);}
       setPressed(true);
       try{ localStorage.setItem(KEY, '1'); }catch(e){}
     }
+
+    // Attempt 1: play fully audible right away — succeeds on browsers/visitors
+    // with high media engagement on this site, PWAs, or lenient autoplay policies.
+    audio.muted = false;
+    var triedUnmuted = audio.play();
+    if(triedUnmuted && typeof triedUnmuted.then === 'function'){
+      triedUnmuted.then(function(){
+        setPressed(true);
+      }).catch(function(){
+        // Attempt 2: browser blocked audible autoplay — fall back to muted autoplay
+        // (always permitted) and unmute on the visitor's very first interaction.
+        audio.muted = true;
+        audio.play().catch(function(){});
+      });
+    }
+
     if(!explicitlyMuted){
-      ['pointerdown','keydown','scroll'].forEach(function(evt){
+      ['pointerdown','keydown','scroll','touchstart','mousemove','wheel'].forEach(function(evt){
         document.addEventListener(evt, unmuteOnInteraction, {once:true, passive:true});
+      });
+      document.addEventListener('visibilitychange', function(){
+        if(!document.hidden && audio.paused && !explicitlyMuted){ audio.play().catch(function(){}); }
       });
     }
 
