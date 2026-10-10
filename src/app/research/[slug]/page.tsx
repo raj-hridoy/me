@@ -97,7 +97,11 @@ export default async function NotePage({
                   <figcaption className="eyebrow">
                     Illustrative example / controlled context
                   </figcaption>
-                  <pre>
+                  <pre
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Code example: ${section.title}`}
+                  >
                     <code>{section.code}</code>
                   </pre>
                 </figure>
