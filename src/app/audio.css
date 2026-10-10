@@ -1,0 +1,134 @@
+/* The soundtrack stays in the existing perimeter; page geometry is unchanged. */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sound-interface {
+  flex: none;
+  width: 116px;
+  height: 44px;
+}
+.sound-interface[data-docked] .sound-control {
+  position: fixed;
+  right: var(--gutter);
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 40;
+  box-shadow: 0 4px 20px #0005;
+}
+.sound-control {
+  width: 116px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 10px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg-deep);
+  color: var(--platinum);
+  font: 9px var(--mono);
+  letter-spacing: 0.45px;
+  transition:
+    color 180ms var(--ease),
+    border-color 180ms var(--ease),
+    background 180ms var(--ease);
+}
+.sound-control svg {
+  width: 17px;
+  height: 20px;
+  flex: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+.sound-label {
+  display: flex;
+  gap: 5px;
+}
+.sound-control:is(:hover, :focus-visible),
+.sound-control[data-phase="blocked"] {
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+.sound-control[data-phase="playing"] {
+  color: var(--accent-bright);
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+.sound-control::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: auto 9px 5px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.25;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms var(--ease);
+}
+.sound-control:is(:hover, :focus-visible, [data-phase="playing"])::after {
+  transform: scaleX(1);
+}
+.sound-control:is([data-phase="starting"], [data-phase="buffering"]) svg {
+  animation: sound-acquire 600ms var(--ease);
+}
+.sound-control:disabled {
+  opacity: 0.55;
+}
+@keyframes sound-acquire {
+  from {
+    opacity: 0.4;
+    translate: -3px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (max-width: 1100px) {
+  .sound-interface {
+    width: 104px;
+  }
+  .header-actions {
+    gap: 10px;
+  }
+  .sound-control {
+    width: 104px;
+    font-size: 8px;
+    padding-inline: 8px;
+  }
+}
+@media (max-width: 800px) {
+  .sound-interface {
+    width: 64px;
+  }
+  .sound-control {
+    width: 64px;
+    gap: 6px;
+    padding-inline: 6px;
+    font-size: 8px;
+    letter-spacing: 0.3px;
+  }
+  .sound-control svg {
+    width: 15px;
+    height: 18px;
+  }
+  .sound-label {
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    line-height: 1.1;
+  }
+  .sound-label > span:last-child {
+    font-size: 7px;
+    letter-spacing: 0;
+  }
+}
+@media print {
+  .sound-interface {
+    display: none;
+  }
+}

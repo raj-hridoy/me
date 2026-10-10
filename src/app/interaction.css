@@ -1,0 +1,471 @@
+/* Living interaction layer. The approved layout, palette and typography stay in globals.css. */
+.scope-plane {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  overflow: clip;
+  contain: strict;
+}
+.scope-cursor,
+.scope-target {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  color: var(--accent-bright);
+}
+.scope-cursor {
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+.scope-cursor[data-visible],
+.scope-target[data-visible] {
+  opacity: 1;
+}
+.scope-reticle {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  left: -15px;
+  top: -15px;
+  transition:
+    width 180ms var(--ease),
+    height 180ms var(--ease),
+    left 180ms var(--ease),
+    top 180ms var(--ease);
+}
+.scope-reticle i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-color: currentColor;
+  border-style: solid;
+  border-width: 0;
+  transition:
+    width 180ms var(--ease),
+    height 180ms var(--ease);
+}
+.scope-reticle i:nth-child(1) {
+  top: calc(0px - var(--scope-drift, 0px));
+  left: 0;
+  border-left-width: 1px;
+  border-top-width: 1px;
+}
+.scope-reticle i:nth-child(2) {
+  top: calc(0px - var(--scope-drift, 0px));
+  right: 0;
+  border-right-width: 1px;
+  border-top-width: 1px;
+}
+.scope-reticle i:nth-child(3) {
+  bottom: var(--scope-drift, 0px);
+  right: 0;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+.scope-reticle i:nth-child(4) {
+  bottom: var(--scope-drift, 0px);
+  left: 0;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+}
+.scope-point {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  top: -1px;
+  left: -1px;
+  background: var(--platinum);
+}
+.scope-label {
+  position: absolute;
+  top: 22px;
+  left: 20px;
+  font: 7px var(--mono);
+  letter-spacing: 1px;
+  color: var(--platinum);
+  white-space: nowrap;
+}
+.scope-cursor[data-mode="link"] .scope-reticle {
+  width: 42px;
+  height: 42px;
+  left: -21px;
+  top: -21px;
+}
+.scope-cursor:is(
+    [data-mode="button"],
+    [data-mode="card"],
+    [data-mode="diagram"]
+  )
+  .scope-reticle {
+  width: 20px;
+  height: 20px;
+  left: -10px;
+  top: -10px;
+}
+.scope-cursor:is(
+    [data-mode="button"],
+    [data-mode="card"],
+    [data-mode="diagram"]
+  )
+  .scope-reticle
+  i {
+  width: 4px;
+  height: 4px;
+}
+.scope-target {
+  z-index: 199;
+  transition: opacity 140ms;
+}
+.scope-target svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.scope-target path {
+  stroke: var(--accent-bright);
+  stroke-width: 1;
+  opacity: 0.7;
+}
+.scope-target[data-mode="button"] path {
+  stroke: var(--platinum);
+  opacity: 0.6;
+}
+.scope-scan {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-bright),
+    transparent
+  );
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  html[data-scope-active="true"]:has(.scope-cursor[data-visible]) {
+    cursor: none;
+  }
+  html[data-scope-active="true"]:has(.scope-cursor[data-visible])
+    :is(a, button, .instrument-art, .diagram-node) {
+    cursor: none;
+  }
+  .card-visual[data-presence] .note-art {
+    transform: perspective(850px) rotateY(var(--presence-tilt-x, 0deg))
+      rotateX(var(--presence-tilt-y, 0deg));
+  }
+}
+.scope-cursor,
+.scope-target,
+.scope-cursor * {
+  user-select: none;
+}
+
+/* Direct inspection targets fit the existing SVG footprint, with native button equivalents. */
+.architecture-focus {
+  position: absolute;
+  top: 10%;
+  right: 9%;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  opacity: 0.7;
+  transition:
+    color 200ms,
+    border-color 200ms,
+    opacity 200ms;
+}
+.architecture-focus svg {
+  width: 18px;
+  height: 18px;
+}
+.boundary-instrument[data-view="focused"] .sculpture-labels {
+  opacity: 0;
+}
+.architecture-focus:is(:hover, :focus-visible, [aria-pressed="true"]) {
+  opacity: 1;
+  color: var(--accent-bright);
+  border-color: var(--accent);
+}
+.architecture-node,
+.diagram-node {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0;
+  transition:
+    border-color 180ms,
+    top 480ms var(--ease),
+    left 480ms var(--ease);
+}
+.architecture-node > span:first-child {
+  display: block;
+  width: 6px;
+  height: 6px;
+  margin: auto;
+  border: 1px solid var(--platinum);
+  background: var(--bg-deep);
+  transition:
+    background 180ms,
+    border-color 180ms;
+}
+.architecture-node[aria-pressed="true"] > span:first-child {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+}
+.architecture-node:is(:hover, :focus-visible),
+.diagram-node:is(:hover, :focus-visible) {
+  border-color: var(--accent);
+}
+.architecture-node-label {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 16px;
+  font: 8px var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+  opacity: 0;
+  transition: opacity 180ms;
+  pointer-events: none;
+}
+.architecture-node:is(:hover, :focus-visible) .architecture-node-label {
+  opacity: 1;
+}
+.architecture-node[hidden] {
+  display: none;
+}
+.request-visual,
+.request-mobile-visual {
+  position: relative;
+}
+.request-visual > svg,
+.request-mobile-visual > svg {
+  display: block;
+}
+.structural-layer path {
+  transition:
+    stroke-opacity 380ms var(--ease),
+    stroke 380ms var(--ease);
+}
+.boundary-sculpture[data-motion="moving"] .architecture-signal {
+  animation: architecture-transfer 480ms linear;
+}
+.instrument-art:has(.architecture-node:hover) .selected-layer path:last-child {
+  stroke-width: 1.5;
+}
+.instrument-art[data-scope-target="diagram"] .sculpture-grid {
+  opacity: 0.26;
+}
+.instrument-layer-detail > span {
+  display: block;
+  animation: inspection-copy 320ms var(--ease);
+}
+.diagram-node[data-scope-target],
+.architecture-node[data-scope-target] {
+  background: var(--accent-wash);
+}
+
+/* Atmosphere appears in response to presence and scroll, never as an endless scene. */
+.opening-scene::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: 12% 15% 8% 38%;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(transparent, black 35%, transparent);
+  opacity: 0;
+  transform: translate(var(--presence-x, 0px), var(--presence-y, 0px));
+  transition: opacity 300ms;
+}
+.opening-scene[data-presence]::after {
+  opacity: 0.23;
+}
+.scene-composition::before {
+  transform: scaleY(calc(1 - var(--scene-progress, 0) * 0.25));
+  transform-origin: top;
+}
+.section-heading {
+  position: relative;
+}
+.section-heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -12px;
+  height: 1px;
+  pointer-events: none;
+  transform: scaleX(var(--line-progress, 0));
+  transform-origin: left;
+  opacity: 0.4;
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    var(--line),
+    transparent 85%
+  );
+}
+.card-visual[data-scope-target]::after {
+  border-color: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+.card-visual .note-art {
+  transition: transform 400ms var(--ease);
+}
+.research-card:focus-visible .card-read svg,
+.research-card:hover .card-read svg {
+  translate: 3px 0;
+}
+.card-read svg,
+.text-link svg {
+  transition: translate 220ms var(--ease);
+}
+.text-link:is(:hover, :focus-visible) svg {
+  translate: 3px -2px;
+}
+.research-grid[data-filter-changed] {
+  animation: inspection-copy 380ms var(--ease);
+}
+.methodology-panels section[data-phase-enter] {
+  animation: inspection-copy 380ms var(--ease);
+}
+.instrument-layer-detail[data-layer-enter] {
+  animation: inspection-copy 320ms var(--ease);
+}
+.button[data-copy-state="copied"] {
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+.copy-check {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 0;
+  animation: confirmation-draw 320ms var(--ease);
+}
+.copy-feedback:not(:empty) {
+  animation: inspection-copy 260ms var(--ease);
+}
+.mobile-menu {
+  animation: menu-scope-reveal 320ms var(--ease);
+}
+.mobile-menu:not([hidden]) nav a {
+  animation: menu-link-entry 380ms var(--ease) both;
+  animation-delay: calc(var(--menu-index, 0) * 35ms);
+}
+.desktop-nav a:focus-visible::after {
+  transform: scaleX(1);
+}
+.nav-loading {
+  animation: navigation-signal 800ms steps(3, end) infinite;
+}
+.button:active,
+.send-request:active,
+.menu-toggle:active {
+  filter: brightness(1.08);
+}
+
+@keyframes inspection-copy {
+  from {
+    opacity: 0.65;
+    translate: 8px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes architecture-transfer {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes confirmation-draw {
+  from {
+    stroke-dashoffset: 30;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes menu-scope-reveal {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes menu-link-entry {
+  from {
+    opacity: 0.65;
+    translate: -10px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes navigation-signal {
+  0% {
+    opacity: 0.4;
+    scale: 0.7 1;
+  }
+  50% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  100% {
+    opacity: 0.4;
+    scale: 0.7 1;
+  }
+}
+@media (max-width: 800px) {
+  .opening-scene::after {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scope-cursor,
+  .scope-target,
+  .opening-scene::after {
+    display: none;
+  }
+  .architecture-node,
+  .structural-layer path {
+    transition: none;
+  }
+  .section-heading::after {
+    transform: none;
+    opacity: 0;
+  }
+  .card-visual .note-art {
+    transform: none !important;
+  }
+}
+@media (hover: none), (pointer: coarse), (forced-colors: active), print {
+  .scope-cursor,
+  .scope-target {
+    display: none;
+  }
+}

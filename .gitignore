@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+.pnpm-store/
+.cache/
+.env*
+!.env.example
+*.tsbuildinfo
+playwright-report/
+test-results/
+.qa/browser/
+.qa/tmp/
+.tooling/
+.qa/
