@@ -1,0 +1,27 @@
+name: Prepare existing Pages settings
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/pages-settings.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect and select Actions publishing
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const args = { owner: context.repo.owner, repo: context.repo.repo };
+            const before = (await github.rest.repos.getPages(args)).data;
+            core.info("Previous Pages configuration: " + JSON.stringify({ build_type: before.build_type, source: before.source, html_url: before.html_url }));
+            await core.summary.addHeading("Previous Pages configuration").addCodeBlock(JSON.stringify({ build_type: before.build_type, source: before.source, html_url: before.html_url }, null, 2), "json").write();
+            if (before.build_type !== "workflow") {
+              await github.rest.repos.updateInformationAboutPagesSite({ ...args, build_type: "workflow" });
+            }
+            const after = (await github.rest.repos.getPages(args)).data;
+            core.info("Current Pages configuration: " + JSON.stringify({ build_type: after.build_type, source: after.source, html_url: after.html_url }));
+            if (after.build_type !== "workflow") core.setFailed("Pages did not switch to Actions publishing");
