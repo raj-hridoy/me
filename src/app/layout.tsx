@@ -10,6 +10,7 @@ import { ScopeCursor } from "@/components/scope-cursor";
 import { site } from "@/data/site";
 import { siteUrl, absoluteSiteUrl } from "@/lib/metadata";
 const base = siteUrl();
+const assetPrefix = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export const metadata: Metadata = {
   ...(base ? { metadataBase: base, alternates: { canonical: base.href } } : {}),
   title: {
@@ -71,21 +72,21 @@ export default function RootLayout({
         )}
         <link
           rel="preload"
-          href="/me/fonts/manrope-latin.woff2"
+          href={assetPrefix + "/fonts/manrope-latin.woff2"}
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/me/fonts/space-grotesk-latin.woff2"
+          href={assetPrefix + "/fonts/space-grotesk-latin.woff2"}
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/me/fonts/ibm-plex-mono-latin.woff2"
+          href={assetPrefix + "/fonts/ibm-plex-mono-latin.woff2"}
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 export function siteUrl(): URL | undefined {
   const value =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://raj-hridoy.github.io/me/";
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.CF_PAGES === "1"
+      ? "https://raj-hridoy.pages.dev/"
+      : "https://raj-hridoy.github.io/me/");
 
   const url = new URL(value);
   if (!["https:", "http:"].includes(url.protocol))

@@ -4,6 +4,22 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = resolve(root, "out");
+const cloudflare = process.env.CF_PAGES === "1";
+const basePath = cloudflare ? "" : "/me";
+const siteOrigin = cloudflare
+  ? "https://raj-hridoy.pages.dev"
+  : "https://raj-hridoy.github.io";
+const sitePrefix = cloudflare ? "" : "/me";
+
+if (cloudflare) {
+  const cssDir = resolve(out, "_next/static/css");
+  for (const file of await readdir(cssDir)) {
+    if (!file.endsWith(".css")) continue;
+    const path = resolve(cssDir, file);
+    const css = await readFile(path, "utf8");
+    await writeFile(path, css.replaceAll("/me/fonts/", "/fonts/"));
+  }
+}
 const routes = [
   "",
   "about",
@@ -19,16 +35,12 @@ for (const route of routes) {
   const html = await readFile(resolve(out, route, "index.html"), "utf8");
   if (!html.includes('http-equiv="Content-Security-Policy"'))
     throw new Error(`Missing static CSP: ${route}`);
-  if (
-    /(?:src|href)="\/(?:_next|fonts|audio|social-preview)(?:\/|\.)/.test(html)
-  )
-    throw new Error(`Unprefixed asset: ${route}`);
-  if (
-    !html.includes(
-      `https://raj-hridoy.github.io/me/${route}${route ? "/" : ""}`,
-    )
-  )
-    throw new Error(`Missing project canonical: ${route}`);
+  const badAsset = cloudflare
+    ? ["/me/_next/", "/me/fonts/", "/me/audio/", "/me/social-preview"].some(prefix => html.includes("=" + String.fromCharCode(34) + prefix))
+    : ["/_next/", "/fonts/", "/audio/", "/social-preview"].some(prefix => html.includes("=" + String.fromCharCode(34) + prefix));
+  if (badAsset) throw Error("Incorrect asset prefix: " + route);
+  const canonical = siteOrigin + sitePrefix + "/" + route + (route ? "/" : "");
+  if (!html.includes(canonical)) throw Error("Missing canonical URL: " + canonical);
 }
 for (const file of [
   "404.html",
@@ -53,7 +65,7 @@ await writeFile(
     {
       repository: "raj-hridoy/me",
       commit: process.env.GITHUB_SHA ?? "local-preview",
-      basePath: "/me",
+      basePath,
       routes,
       builtAt: new Date().toISOString(),
     },
@@ -62,5 +74,5 @@ await writeFile(
   ) + "\n",
 );
 console.log(
-  `Pages artifact verified: ${routes.length} routes, fonts, SEO, both audio codecs, /me paths.`,
+  `Pages artifact verified: ${routes.length} routes, fonts, SEO, audio codecs; basePath=${basePath || "/"}.`,
 );

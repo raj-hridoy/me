@@ -1,9 +1,11 @@
+const isCloudflare = process.env.CF_PAGES === "1";
+const basePath = isCloudflare ? "" : "/me";
 const nextConfig = {
   output: "export",
-  basePath: "/me",
+  basePath,
   trailingSlash: true,
   images: { unoptimized: true },
-  env: { NEXT_PUBLIC_BASE_PATH: "/me" },
+  env: { NEXT_PUBLIC_BASE_PATH: basePath },
   devIndicators: false,
   poweredByHeader: false,
   experimental: {
