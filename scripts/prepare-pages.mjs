@@ -36,8 +36,8 @@ for (const route of routes) {
   if (!html.includes('http-equiv="Content-Security-Policy"'))
     throw new Error(`Missing static CSP: ${route}`);
   const badAsset = cloudflare
-    ? ["/me/_next/", "/me/fonts/", "/me/audio/", "/me/social-preview"].some(prefix => html.includes("=" + String.fromCharCode(34) + prefix))
-    : ["/_next/", "/fonts/", "/audio/", "/social-preview"].some(prefix => html.includes("=" + String.fromCharCode(34) + prefix));
+    ? ["/me/_next/", "/me/fonts/", "/me/social-preview"].some(prefix => html.includes("=" + String.fromCharCode(34) + prefix))
+    : ["/_next/", "/fonts/", "/social-preview"].some(prefix => html.includes("=" + String.fromCharCode(34) + prefix));
   if (badAsset) throw Error("Incorrect asset prefix: " + route);
   const canonical = siteOrigin + sitePrefix + "/" + route + (route ? "/" : "");
   if (!html.includes(canonical)) throw Error("Missing canonical URL: " + canonical);
@@ -50,11 +50,6 @@ for (const file of [
   "google90d4a5ce39b0a0ad.html",
 ])
   await stat(resolve(out, file));
-const soundtrack = JSON.parse(
-  await readFile(resolve(root, "src/data/soundtrack.json"), "utf8"),
-);
-for (const file of [soundtrack.opus, soundtrack.aac])
-  await stat(resolve(out, "audio", file));
 const fonts = await readdir(resolve(out, "fonts"));
 if (fonts.filter((f) => f.endsWith(".woff2")).length < 3)
   throw new Error("Fonts missing");
@@ -74,5 +69,5 @@ await writeFile(
   ) + "\n",
 );
 console.log(
-  `Pages artifact verified: ${routes.length} routes, fonts, SEO, audio codecs; basePath=${basePath || "/"}.`,
+  `Pages artifact verified: ${routes.length} routes, fonts, SEO; basePath=${basePath || "/"}.`,
 );

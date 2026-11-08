@@ -6,7 +6,6 @@ import type { CSSProperties } from "react";
 import { navigation } from "@/data/site";
 import { Arrow, Mark } from "./icons";
 import { NavigationProgress } from "./navigation-progress";
-import { SoundControl } from "./background-audio";
 export function Navigation() {
   const path = usePathname().replace(/^\/me(?=\/|$)/, "");
   const [open, setOpen] = useState(false);
@@ -21,9 +20,6 @@ export function Navigation() {
       }
       if (event.key === "Tab" && menu.current) {
         const elements = [
-          button.current
-            ?.closest("header")
-            ?.querySelector<HTMLButtonElement>("[data-audio-control]"),
           button.current,
           ...Array.from(menu.current.querySelectorAll<HTMLAnchorElement>("a")),
         ].filter(Boolean) as HTMLElement[];
@@ -69,7 +65,6 @@ export function Navigation() {
         ))}
       </nav>
       <div className="header-actions">
-        <SoundControl />
         <Link className="header-contact" href="/contact">
           Let’s talk <Arrow diagonal />
         </Link>

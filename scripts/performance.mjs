@@ -3,16 +3,13 @@ import lighthouse from "lighthouse";
 import desktopConfig from "lighthouse/core/config/desktop-config.js";
 import { mkdir, writeFile } from "node:fs/promises";
 const portal = process.env.CODEX_PORTAL_WORKAROUND === "1";
-const audioAllowed = process.env.QA_AUDIO_AUTOPLAY === "1";
 await mkdir(".qa/performance", { recursive: true });
 for (const formFactor of ["desktop", "mobile"]) {
   const browser = await chromium.launch({
     headless: true,
-    ...(audioAllowed ? { ignoreDefaultArgs: ["--mute-audio"] } : {}),
     args: [
       "--no-sandbox",
       "--remote-debugging-port=9222",
-      ...(audioAllowed ? ["--autoplay-policy=no-user-gesture-required"] : []),
       ...(portal
         ? [
             "--single-process",
@@ -46,7 +43,6 @@ for (const formFactor of ["desktop", "mobile"]) {
     console.log(
       JSON.stringify({
         formFactor,
-        audioAllowed,
         scores: Object.fromEntries(
           Object.entries(result.lhr.categories).map(([key, value]) => [
             key,

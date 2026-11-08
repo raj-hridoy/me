@@ -6,7 +6,6 @@ The dark refinement preserves Boundary Studies’ monumental typography and uneq
 
 The living experience adds a context-sensitive square optical cursor, direct diagram nodes, interruptible architecture transitions and focusing, pointer-directed lighting and card depth, scroll-responsive structural lines, and concise navigation/filter/copy feedback. Native text interaction, touch, keyboard, reduced motion, and fallback behavior are preserved. See [the interaction upgrade](docs/living-experience.md).
 
-The supplied Bliss soundtrack now has a persistent root-layout controller, optimized same-origin Opus/AAC assets, immediate audible autoplay, and direct first-interaction retries when autoplay is blocked. Sound defaults on at 100% media volume; deliberate off is remembered. A square header control docks while reading. It shows READY when awaiting permission and ON only while actually playing. See [the encoding and playback report](docs/audio-integration.md) for exact settings, size comparisons, loop preparation, browser tests, and rights status. The user confirmed permission to publish the recording on 2026-10-10.
 
 ## Run locally
 
@@ -43,7 +42,6 @@ src/data/site.ts         Identity, exact profile URLs, recognitions, research ar
 src/data/notes.ts        Typed educational notes and approved case-study model
 src/lib/metadata.ts      Shared metadata and deployment URL validation
 public/                  Original SVG and PNG social preview
-  audio/                 Fingerprinted 96 kbps Opus / 128 kbps AAC-LC soundtrack
 scripts/                 Asset generation, performance checks, portal workaround
 tests/                  Playwright interaction, route, layout, and accessibility tests
 docs/                    Art direction and verification report
@@ -67,17 +65,16 @@ The archive and article renderer distinguish public case studies from educationa
 
 This repository exports the approved portfolio to `out/` for https://raj-hridoy.github.io/me/. `next.config.mjs` sets static export, `/me`, trailing slashes, and unoptimized images. All nine public routes are generated at build time. Research query filters run in the client; the exported HTML retains readable research cards without JavaScript.
 
-`npm run build` runs Next.js and verifies the complete artifact with `scripts/prepare-pages.mjs`. That check covers canonical URLs, project asset paths, fonts, SEO files, both soundtrack formats, and all generated pages. It creates `.nojekyll` and a public `deployment.json` containing the build commit for live verification. `npm run start` previews this exact static export at http://localhost:3000/me/; it does not run a production Next.js server. Development also uses `/me/`.
+`npm run build` runs Next.js and verifies the complete artifact with `scripts/prepare-pages.mjs`. That check covers canonical URLs, project asset paths, fonts, SEO files, and all generated pages. It creates `.nojekyll` and a public `deployment.json` containing the build commit for live verification. `npm run start` previews this exact static export at http://localhost:3000/me/; it does not run a production Next.js server. Development also uses `/me/`.
 
 The deployment workflow in `.github/workflows/deploy-pages.yml` installs the lockfile on Node 24, runs lint, the build, type checks, and Playwright against the export, uploads `out/`, and deploys with GitHub's Pages action. It runs on pushes to `main` and manual dispatch. The repository's Pages publishing source must be **GitHub Actions**. Permissions are read-only during the build; only the deployment job receives Pages write and OIDC permission. Action versions are pinned to verified release commits.
 
 The production canonical URL defaults to the actual destination and is set explicitly in CI. `.env.example` documents it. If moving this project, update the Next.js base path, font URLs/preloads, canonical URL, tests, and hosting configuration together, then rebuild. No domain, token, or other secret is embedded in the site.
 
-The old site's Google ownership verification file is preserved under `public/`. Old homepage code, styles, and soundtrack assets belong only to the verified backup branch. Deployment state and rollback information are recorded in `docs/deployment.md`.
+The old site's Google ownership verification file is preserved under `public/`. Old homepage code and styles belong only to the verified backup branch. Deployment state and rollback information are recorded in `docs/deployment.md`.
 
-The user confirmed approval and permission to publish the supplied Bliss soundtrack on 2026-10-10. The local encoding report does not independently establish ownership.
 
-GitHub Pages controls HTTP response headers. The export includes a document CSP restricting asset origins, objects, base URLs, and form submission. Frame restrictions and custom HTTP headers cannot be enforced by an HTML meta policy; production header behavior must be checked on the live host. The static preview's range and cache headers support audio QA but do not configure GitHub's CDN.
+GitHub Pages controls HTTP response headers. The export includes a document CSP restricting asset origins, objects, base URLs, and form submission. Frame restrictions and custom HTTP headers cannot be enforced by an HTML meta policy; production header behavior must be checked on the live host. The static preview uses same-origin asset delivery; GitHub's CDN controls production caching.
 
 ## Checks and tests
 
@@ -116,7 +113,6 @@ The paper-direction review is preserved under `.qa/overhaul/`. Dark-refinement b
 
 Living-experience before screenshots, two review passes, production captures, idle-frame evidence, and layout results are in `.qa/living/`. Run `scripts/inspect-living.mjs final` with Node against the production server to capture desktop and touch-emulated phone states. Run browser inspection, the test suite, and Lighthouse sequentially on this desktop's single-process browser.
 
-Audio source inspection, five bitrate candidates, exact FFmpeg commands/probes, objective signal comparisons, and before/after verification are in `.qa/audio/`. `scripts/optimize-audio.py` regenerates assets from the unchanged supplied recording with FFmpeg/FFprobe; `scripts/analyze-audio.py` performs offline NumPy analysis. Neither tool is used by the website. `scripts/inspect-audio.mjs visual` captures five responsive audio-control profiles; its `browsers` mode checks Firefox/WebKit where host libraries permit. `tests/audio.spec.ts` verifies native autoplay and gestures, 100% volume, codec selection, loop wrap, one instance across routes, remembered off, range delivery, throttled progressive playback, bounded rejected attempts, lifecycle state, and network retry. Tracing is disabled for these policy tests because DevTools evaluations can grant activation before hydration.
 
 ## Security choices
 

@@ -17,8 +17,6 @@ const mime = {
   ".png": "image/png",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
-  ".ogg": "audio/ogg",
-  ".m4a": "audio/mp4",
 };
 const port = Number(process.env.PORT ?? 3000);
 createServer(async (req, res) => {
@@ -68,7 +66,7 @@ createServer(async (req, res) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader(
       "Cache-Control",
-      /\/(?:audio|_next\/static)\//.test(path)
+      /\/_next\/static\//.test(path)
         ? "public, max-age=31536000, immutable"
         : "no-cache",
     );

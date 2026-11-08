@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./interaction.css";
-import "./audio.css";
-import { BackgroundAudio } from "@/components/background-audio";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ExperienceMotion } from "@/components/experience-motion";
@@ -67,7 +65,7 @@ export default function RootLayout({
         {process.env.NODE_ENV === "production" && (
           <meta
             httpEquiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'"
+            content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'"
           />
         )}
         <link
@@ -96,13 +94,11 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <BackgroundAudio>
-          <Navigation />
-          <main id="main">{children}</main>
-          <ExperienceMotion />
-          <ScopeCursor />
-          <Footer />
-        </BackgroundAudio>
+        <Navigation />
+        <main id="main">{children}</main>
+        <ExperienceMotion />
+        <ScopeCursor />
+        <Footer />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
